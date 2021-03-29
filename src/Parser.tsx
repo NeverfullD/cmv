@@ -1,24 +1,6 @@
 import React from "react";
 import "./Parser.css";
 var model = require("./model");
-var actions = {
-    makeCompartment: function (input: any, start: any, end: any, elements: any) {
-        console.log(elements);
-        console.log("ident: " + elements[4].text);
-        console.log("value " + elements[6].text);
-    },
-    makeParameter: function (input: any, start: any, end: any, elements: any) {
-        console.log(elements);
-        console.log("ident: " + elements[4].text);
-        console.log("value " + elements[6].text);
-    },
-    makeReaction: function (input: any, start: any, end: any, elements: any) {
-        console.log(elements);
-        console.log("orig: " + elements[4].text);
-        console.log("dest: " + elements[6].text);
-        console.log("value " + elements[8].text);
-    },
-};
 
 interface CModel {
     compartments: Compartment[];
