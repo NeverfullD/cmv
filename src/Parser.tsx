@@ -1,33 +1,14 @@
 import React from "react";
 import "./Parser.css";
+import { CModel } from "./Types";
+
 var model = require("./model");
 
-interface CModel {
-    compartments: Compartment[];
-    parameters: Parameter[];
-    reactions: Reaction[];
+interface IProps {
+    setNewModel: (newModel: CModel) => void;
 }
-
-interface Compartment {
-    name: string;
-    value: number;
-}
-
-interface Parameter {
-    name: string;
-    value: number;
-}
-
-interface Reaction {
-    orig: string;
-    dest: string;
-    value: string;
-}
-
-interface IProps {}
 
 interface IState {
-    model: CModel;
     value: string;
 }
 
@@ -35,7 +16,6 @@ export default class Parser extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            model: { compartments: [], parameters: [], reactions: [] },
             value: "(comp A 10)(comp B 10)(param k 0.1)(react A B {A * k})",
         };
     }
@@ -43,7 +23,7 @@ export default class Parser extends React.Component<IProps, IState> {
     //Parse Model
     cModel: CModel = { compartments: [], parameters: [], reactions: [] };
     makeCompartment(elements: any) {
-        var comp = { name: elements.elements[4].text, value: +elements.elements[6].text };
+        var comp = { name: elements.elements[4].text, value: [+elements.elements[6].text] };
         this.cModel.compartments.push(comp);
     }
     makeParameter(elements: any) {
@@ -68,8 +48,7 @@ export default class Parser extends React.Component<IProps, IState> {
         tree.elements[4].elements.forEach(this.makeReaction.bind(this));
 
         //console.log(this.cModel);
-        this.setState({ model: this.cModel });
-        //console.log(this.state.model);
+        this.props.setNewModel(this.cModel);
 
         event.preventDefault();
     }
