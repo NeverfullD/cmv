@@ -1,5 +1,5 @@
 import React from "react";
-import Chart from "./Chart";
+import MyChart from "./Chart";
 import Graph from "./Graph";
 import Parser from "./Parser";
 import Settings from "./Settings";
@@ -21,7 +21,7 @@ export default class Main extends React.Component<IProps, IState> {
                 Test
                 <Parser />
                 <Settings />
-                <Chart />
+                <MyChart />
                 <Graph />
             </div>
         );
