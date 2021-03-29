@@ -1,46 +1,48 @@
 import React from "react";
-import "./Graph.css";
-
 import ForceGraph2D, { NodeObject } from "react-force-graph-2d";
+
+import "./Graph.css";
+import { CModel } from "./Types";
 
 interface NodeType extends NodeObject {
     size: number;
 }
 
-interface IProps {}
+interface IProps {
+    model: CModel;
+}
 
 interface IState {
-    data: { nodes: { id: number; size: number }[]; links: { source: number; target: number }[] };
+    data: { nodes: { id: any; size: number }[]; links: { source: any; target: any }[] };
 }
 
 export default class Graph extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
+
+        var data = this.generateInitialDataStructure();
+        console.log(data);
+
         this.state = {
-            data: {
-                nodes: [
-                    { id: 0, size: 1 },
-                    { id: 1, size: 2 },
-                    { id: 2, size: 3 },
-                    { id: 3, size: 4 },
-                    { id: 4, size: 5 },
-                ],
-                links: [
-                    { source: 0, target: 1 },
-                    { source: 3, target: 4 },
-                    { source: 2, target: 4 },
-                    { source: 3, target: 1 },
-                ],
-            },
+            data: data,
         };
+    }
+
+    generateInitialDataStructure() {
+        var node: { id: any; size: number }[] = [];
+        this.props.model.compartments.forEach((c) => {
+            node.push({ id: c.name, size: c.value[0] });
+        });
+        var link: { source: any; target: any }[] = [];
+        this.props.model.reactions.forEach((c) => {
+            link.push({ source: c.orig, target: c.dest });
+        });
+        return { nodes: node, links: link };
     }
 
     componentDidMount() {}
 
     onClick() {
-        var tmp = this.state.data;
-        console.log(tmp);
-
         this.setState({
             data: {
                 nodes: [

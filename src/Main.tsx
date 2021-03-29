@@ -28,16 +28,20 @@ export default class Main extends React.Component<IProps, IState> {
     onClick() {
         console.log(this.state.model);
     }
+    onSimulate = () => {
+        console.log("TODO");
+    };
 
     render() {
         return (
             <div>
                 Test
                 <button onClick={this.onClick.bind(this)}>Test</button>
+                <button onClick={this.onSimulate}>Simple Simulate</button>
                 <Parser setNewModel={this.setModel} />
                 <Settings />
                 <MyChart />
-                <Graph />
+                <Graph model={this.state.model} key={this.state.model.compartments.length} />
             </div>
         );
     }
