@@ -1,3 +1,8 @@
 .parser {
     border: 2px solid red;
 }
+
+.parserText {
+    height: 200px;
+    width: 500px;
+}
