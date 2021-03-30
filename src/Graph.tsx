@@ -13,7 +13,7 @@ interface IProps {
 }
 
 interface IState {
-    data: { nodes: { id: any; size: number }[]; links: { source: any; target: any }[] };
+    data: { nodes: { id: string; size: number }[]; links: { source: string; target: string }[] };
 }
 
 export default class Graph extends React.Component<IProps, IState> {
@@ -29,11 +29,11 @@ export default class Graph extends React.Component<IProps, IState> {
     }
 
     generateInitialDataStructure() {
-        var node: { id: any; size: number }[] = [];
+        var node: { id: string; size: number }[] = [];
         this.props.model.compartments.forEach((c) => {
-            node.push({ id: c.name, size: c.value[0] });
+            node.push({ id: c.name, size: c.value[c.value.length - 1] });
         });
-        var link: { source: any; target: any }[] = [];
+        var link: { source: string; target: string }[] = [];
         this.props.model.reactions.forEach((c) => {
             link.push({ source: c.orig, target: c.dest });
         });
@@ -42,25 +42,7 @@ export default class Graph extends React.Component<IProps, IState> {
 
     componentDidMount() {}
 
-    onClick() {
-        this.setState({
-            data: {
-                nodes: [
-                    { id: 0, size: 10 },
-                    { id: 1, size: 2 },
-                    { id: 2, size: 3 },
-                    { id: 3, size: 4 },
-                    { id: 4, size: 5 },
-                ],
-                links: [
-                    { source: 0, target: 1 },
-                    { source: 3, target: 4 },
-                    { source: 2, target: 4 },
-                    { source: 3, target: 1 },
-                ],
-            },
-        });
-    }
+    onClick() {}
 
     render() {
         return (
@@ -73,7 +55,9 @@ export default class Graph extends React.Component<IProps, IState> {
                     width={500}
                     height={500}
                 />
-                <button onClick={this.onClick.bind(this)}>Test</button>
+                {
+                    //<button onClick={this.onClick.bind(this)}>Test</button>
+                }
             </div>
         );
     }

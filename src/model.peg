@@ -6,7 +6,7 @@ parameter <- `(` whitespace? `param` whitespace? ident whitespace? value whitesp
 reaction <- `(` whitespace? `react` whitespace? orig whitespace? dest whitespace? calc whitespace? `)` whitespace?
 orig <- ident
 dest <- ident
-ident <- [A-Za-z0-9]+
+ident <- [A-Za-z]+
 value <- [0-9\.]+
 whitespace <- [\s*]
 calc <- `{` [^}]* `}`

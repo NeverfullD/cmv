@@ -1,8 +1,14 @@
 import React from "react";
 import Chart from "react-google-charts";
-import "./Chart.css";
 
-interface IProps {}
+import "./Chart.css";
+import { CModel } from "./Types";
+
+interface IProps {
+    model: CModel;
+    stepSize: number;
+    currentTick: number;
+}
 
 interface IState {
     data: any[];
@@ -11,28 +17,30 @@ interface IState {
 export default class MyChart extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
+        var data = this.generateData();
         this.state = {
-            data: [
-                ["x", "dogs", "cats"],
-                [0, 0, 0],
-                [1, 10, 5],
-                [2, 23, 15],
-                [3, 17, 9],
-                [4, 18, 10],
-                [5, 9, 5],
-                [6, 11, 3],
-                [7, 27, 19],
-            ],
+            data: data,
         };
+    }
+
+    generateData() {
+        var data: any[] = [];
+        var header = ["x"];
+        this.props.model.compartments.forEach((c) => header.push(c.name));
+        data.push(header);
+        for (let i = 0; i <= this.props.currentTick; i++) {
+            var dataPoint = [i * this.props.stepSize];
+            this.props.model.compartments.forEach((c) => dataPoint.push(c.value[i]));
+            data.push(dataPoint);
+        }
+        console.log(data);
+
+        return data;
     }
 
     componentDidMount() {}
 
-    onClick() {
-        var tmp = this.state.data;
-        tmp.push([8, 10, 12]);
-        this.setState({ data: tmp });
-    }
+    onClick() {}
 
     render() {
         return (
@@ -49,12 +57,14 @@ export default class MyChart extends React.Component<IProps, IState> {
                             title: "Time",
                         },
                         vAxis: {
-                            title: "Popularity",
+                            title: "Value",
                         },
                     }}
                     rootProps={{ "data-testid": "2" }}
                 />
-                <button onClick={this.onClick.bind(this)}>Test</button>
+                {
+                    //<button onClick={this.onClick.bind(this)}>Test</button>
+                }
             </div>
         );
     }

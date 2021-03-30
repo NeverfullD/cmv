@@ -766,7 +766,7 @@
         if (this._offset < this._inputSize) {
           chunk0 = this._input.substring(this._offset, this._offset + 1);
         }
-        if (chunk0 !== null && /^[A-Za-z0-9]/.test(chunk0)) {
+        if (chunk0 !== null && /^[A-Za-z]/.test(chunk0)) {
           address1 = new TreeNode(this._input.substring(this._offset, this._offset + 1), this._offset);
           this._offset = this._offset + 1;
         } else {
@@ -776,7 +776,7 @@
             this._expected = [];
           }
           if (this._offset === this._failure) {
-            this._expected.push('[A-Za-z0-9]');
+            this._expected.push('[A-Za-z]');
           }
         }
         if (address1 !== FAILURE) {
