@@ -34,7 +34,7 @@ export default class Parser extends React.Component<IProps, IState> {
         var react = {
             orig: elements.elements[4].text,
             dest: elements.elements[6].text,
-            value: elements.elements[8].text,
+            value: elements.elements[8].text.replace(/[\{\}']+/g, ""),
         };
         this.cModel.reactions.push(react);
     }

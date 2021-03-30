@@ -5,6 +5,8 @@ import Graph from "./Graph";
 import Parser from "./Parser";
 import Settings from "./Settings";
 
+const Evaluator = require("expr-eval").Parser;
+
 interface IProps {}
 
 interface IState {
@@ -45,10 +47,13 @@ export default class Main extends React.Component<IProps, IState> {
     solveSteps(steps: number) {
         for (let i = 0; i < steps; i++) {
             var delta = new Map();
+            var variables = new Map();
+            this.state.model.compartments.forEach((c) => variables.set(c.name, c.value[this.state.currentTick + i]));
+            this.state.model.parameters.forEach((p) => variables.set(p.name, p.value));
             this.state.model.compartments.forEach((c) => delta.set(c.name, c.value[this.state.currentTick + i]));
             //calculate Delta
             this.state.model.reactions.forEach((r) => {
-                var res = this.evaluateExpression(r.value) * this.state.stepSize;
+                var res = this.evaluateExpression(r.value, variables) * this.state.stepSize;
                 delta.set(r.dest, delta.get(r.dest) + res);
                 delta.set(r.orig, delta.get(r.orig) - res);
             });
@@ -59,8 +64,8 @@ export default class Main extends React.Component<IProps, IState> {
         this.setState({ currentTick: this.state.currentTick + steps });
     }
 
-    evaluateExpression(exp: string): number {
-        return 0.1;
+    evaluateExpression(exp: string, variables: Map<string, number>): number {
+        return Evaluator.evaluate(exp, Object.fromEntries(variables));
     }
 
     render() {
