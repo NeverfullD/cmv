@@ -35,12 +35,12 @@ export default class Main extends React.Component<IProps, IState> {
         console.log(this.state.model);
     };
 
-    onSimulate = () => {
-        this.solveSteps(1);
+    onSimulate = (n: number) => {
+        this.solveSteps(n);
     };
 
-    onSimulate100 = () => {
-        this.solveSteps(100);
+    changeStepSize = (stepSize: number) => {
+        this.setState({ stepSize: stepSize });
     };
 
     //simple Solver
@@ -73,10 +73,12 @@ export default class Main extends React.Component<IProps, IState> {
             <div>
                 Test
                 <button onClick={this.onClick}>Test</button>
-                <button onClick={this.onSimulate}>Simple Simulate</button>
-                <button onClick={this.onSimulate100}>Simple Simulate 100</button>
                 <Parser setNewModel={this.setModel} />
-                <Settings />
+                <Settings
+                    onSimulate={this.onSimulate}
+                    changeStepSize={this.changeStepSize}
+                    stepSize={this.state.stepSize}
+                />
                 <MyChart
                     model={this.state.model}
                     stepSize={this.state.stepSize}
