@@ -6,7 +6,7 @@ import { CModel } from "./Types";
 
 interface IProps {
     model: CModel;
-    stepSize: number;
+    timeSteps: number[];
     currentTick: number;
 }
 
@@ -29,7 +29,7 @@ export default class MyChart extends React.Component<IProps, IState> {
         this.props.model.compartments.forEach((c) => header.push(c.name));
         data.push(header);
         for (let i = 0; i <= this.props.currentTick; i++) {
-            var dataPoint = [i * this.props.stepSize];
+            var dataPoint = [this.props.timeSteps[i]];
             this.props.model.compartments.forEach((c) => dataPoint.push(c.value[i]));
             data.push(dataPoint);
         }

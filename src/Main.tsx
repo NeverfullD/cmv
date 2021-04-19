@@ -11,6 +11,7 @@ interface IProps {}
 
 interface IState {
     model: CModel;
+    timeSteps: number[];
     stepSize: number;
     currentTick: number;
 }
@@ -22,13 +23,14 @@ export default class Main extends React.Component<IProps, IState> {
             model: { compartments: [], parameters: [], reactions: [] },
             stepSize: 0.1,
             currentTick: 0,
+            timeSteps: [],
         };
     }
 
     componentDidMount() {}
 
     setModel = (newModel: CModel) => {
-        this.setState({ model: newModel, currentTick: 0 });
+        this.setState({ model: newModel, currentTick: 0, timeSteps: [0] });
     };
 
     onClick = () => {
@@ -49,7 +51,7 @@ export default class Main extends React.Component<IProps, IState> {
             var delta = new Map();
             var variables = new Map();
             this.state.model.compartments.forEach((c) => variables.set(c.name, c.value[this.state.currentTick + i]));
-            this.state.model.parameters.forEach((p) => variables.set(p.name, p.value));
+            this.state.model.parameters.forEach((p) => variables.set(p.name, p.value)); //TODO insert Constant at parse time
             this.state.model.compartments.forEach((c) => delta.set(c.name, c.value[this.state.currentTick + i]));
             //calculate Delta
             this.state.model.reactions.forEach((r) => {
@@ -59,6 +61,9 @@ export default class Main extends React.Component<IProps, IState> {
             });
             //apply Delta
             this.state.model.compartments.forEach((c) => c.value.push(delta.get(c.name)));
+
+            //save Timestamps for variable step size
+            this.state.timeSteps.push(this.state.timeSteps[this.state.currentTick + i] + this.state.stepSize);
         }
         //endCurrentTick
         this.setState({ currentTick: this.state.currentTick + steps });
@@ -81,7 +86,7 @@ export default class Main extends React.Component<IProps, IState> {
                 />
                 <MyChart
                     model={this.state.model}
-                    stepSize={this.state.stepSize}
+                    timeSteps={this.state.timeSteps}
                     currentTick={this.state.currentTick}
                     key={this.state.currentTick + "chart"}
                 />
