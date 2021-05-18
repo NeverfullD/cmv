@@ -78,6 +78,7 @@ export default class Main extends React.Component<IProps, IState> {
             <div>
                 Test
                 <button onClick={this.onClick}>Test</button>
+                <a href="https://github.com/NeverfullD/cmv">to Github</a>
                 <Parser setNewModel={this.setModel} />
                 <Settings
                     onSimulate={this.onSimulate}
