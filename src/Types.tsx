@@ -1,21 +1,15 @@
 export interface CModel {
-    compartments: Compartment[];
     parameters: Parameter[];
-    reactions: Reaction[];
+    compartments: Compartment[];
 }
 
 export interface Compartment {
     name: string;
     value: number[];
+    ODE: string;
 }
 
 export interface Parameter {
     name: string;
     value: number;
-}
-
-export interface Reaction {
-    orig: string;
-    dest: string;
-    value: string;
 }

@@ -34,9 +34,7 @@ export default class Graph extends React.Component<IProps, IState> {
             node.push({ id: c.name, size: c.value[c.value.length - 1] });
         });
         var link: { source: string; target: string }[] = [];
-        this.props.model.reactions.forEach((c) => {
-            link.push({ source: c.orig, target: c.dest });
-        });
+        //this.props.model.reactions.forEach((c) => {            link.push({ source: c.orig, target: c.dest });        });
         return { nodes: node, links: link };
     }
 
