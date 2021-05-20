@@ -45,20 +45,39 @@ export default class Main extends React.Component<IProps, IState> {
         this.setState({ stepSize: stepSize });
     };
 
-    //simple Solver
+    //solvers
+    //Runge-Kutta solver 2 Order
+    rungeKutta2(variables: Map<string, number>) {
+        var middleVariables = new Map(variables); //contains variable values at half point of the step
+        this.state.model.compartments.forEach((c) => {
+            var k1 = this.evaluateExpression(c.ODE, variables) * (this.state.stepSize / 2);
+            middleVariables.set(c.name, c.value[c.value.length - 1] + k1);
+        });
+        console.log(variables);
+        console.log(middleVariables);
+
+        this.state.model.compartments.forEach((c) => {
+            var k2 = this.evaluateExpression(c.ODE, middleVariables) * this.state.stepSize;
+            c.value.push(c.value[c.value.length - 1] + k2);
+        });
+    }
+
+    euler(variables: Map<string, number>) {
+        this.state.model.compartments.forEach((c) => {
+            var res = this.evaluateExpression(c.ODE, variables) * this.state.stepSize;
+            c.value.push(c.value[c.value.length - 1] + res);
+        });
+    }
+
+    //Main for solvers
     solveSteps(steps: number) {
         for (let i = 0; i < steps; i++) {
             var variables = new Map();
             this.state.model.compartments.forEach((c) => variables.set(c.name, c.value[this.state.currentTick + i]));
             this.state.model.parameters.forEach((p) => variables.set(p.name, p.value)); //TODO insert Constant at parse time
             //calculate Step
-            this.state.model.compartments.forEach((c) => {
-                var res = this.evaluateExpression(c.ODE, variables) * this.state.stepSize;
-                c.value.push(c.value[c.value.length - 1] + res);
-            });
-
-            //apply Delta
-
+            //this.euler(variables);
+            this.rungeKutta2(variables);
             //save Timestamps for variable step size
             this.state.timeSteps.push(this.state.timeSteps[this.state.currentTick + i] + this.state.stepSize);
         }
