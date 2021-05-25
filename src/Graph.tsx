@@ -21,7 +21,7 @@ export default class Graph extends React.Component<IProps, IState> {
         super(props);
 
         var data = this.generateInitialDataStructure();
-        console.log(data);
+        //console.log(data);
 
         this.state = {
             data: data,
