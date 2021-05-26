@@ -11,6 +11,131 @@ export interface Solver {
     execute(variables: Map<string, number>): Result;
 }
 
+export class EulerMethod implements Solver {
+    stepSize: number;
+    timeStep: number;
+    model: CModel;
+
+    constructor(stepSize: number, timeStep: number, model: CModel) {
+        this.stepSize = stepSize;
+        this.timeStep = timeStep;
+        this.model = model;
+    }
+
+    execute(variables: Map<string, number>) {
+        var res: Map<string, number> = new Map();
+        this.model.compartments.forEach((c) => {
+            var k = this.evaluateExpression(c.ODE, variables) * this.stepSize;
+            res.set(c.name, c.value[c.value.length - 1] + k);
+        });
+        this.timeStep = this.timeStep + this.stepSize;
+        return {
+            result: res,
+            timeStep: this.timeStep,
+        };
+    }
+
+    evaluateExpression(exp: string, variables: Map<string, number>): number {
+        return Evaluator.evaluate(exp, Object.fromEntries(variables));
+    }
+}
+
+export class RungeKutta2Method implements Solver {
+    stepSize: number;
+    timeStep: number;
+    model: CModel;
+
+    constructor(stepSize: number, timeStep: number, model: CModel) {
+        this.stepSize = stepSize;
+        this.timeStep = timeStep;
+        this.model = model;
+    }
+
+    execute(variables: Map<string, number>) {
+        var res: Map<string, number> = new Map();
+        var interVariables = new Map(variables); //contains variable values at half point of the step
+        this.model.compartments.forEach((c) => {
+            var k1 = this.evaluateExpression(c.ODE, variables) * (this.stepSize / 2);
+            interVariables.set(c.name, c.value[c.value.length - 1] + k1);
+        });
+
+        this.model.compartments.forEach((c) => {
+            var k2 = this.evaluateExpression(c.ODE, interVariables) * this.stepSize;
+            res.set(c.name, c.value[c.value.length - 1] + k2);
+        });
+        this.timeStep = this.timeStep + this.stepSize;
+        return {
+            result: res,
+            timeStep: this.timeStep,
+        };
+    }
+
+    evaluateExpression(exp: string, variables: Map<string, number>): number {
+        return Evaluator.evaluate(exp, Object.fromEntries(variables));
+    }
+}
+
+export class RungeKutta4Method implements Solver {
+    stepSize: number;
+    timeStep: number;
+    model: CModel;
+
+    constructor(stepSize: number, timeStep: number, model: CModel) {
+        this.stepSize = stepSize;
+        this.timeStep = timeStep;
+        this.model = model;
+    }
+
+    execute(variables: Map<string, number>) {
+        var res: Map<string, number> = new Map();
+        var interVariables = new Map(variables); //contains variables for intermediary steps
+        var allK = new Map();
+        //calc k1
+        this.model.compartments.forEach((c) => {
+            var k1 = this.evaluateExpression(c.ODE, variables) * this.stepSize;
+            interVariables.set(c.name, c.value[c.value.length - 1] + k1 / 2);
+            allK.set(c.name, [k1]);
+        });
+        //calc k2
+        this.model.compartments.forEach((c) => {
+            var k2 = this.evaluateExpression(c.ODE, interVariables) * this.stepSize;
+            interVariables.set(c.name, c.value[c.value.length - 1] + k2 / 2);
+            allK.get(c.name).push(k2);
+        });
+        //calc k3
+        this.model.compartments.forEach((c) => {
+            var k3 = this.evaluateExpression(c.ODE, interVariables) * this.stepSize;
+            interVariables.set(c.name, c.value[c.value.length - 1] + k3);
+            allK.get(c.name).push(k3);
+        });
+        //calc k4
+        this.model.compartments.forEach((c) => {
+            var k4 = this.evaluateExpression(c.ODE, interVariables) * this.stepSize;
+            allK.get(c.name).push(k4);
+        });
+        //calc y_n+1
+        this.model.compartments.forEach((c) => {
+            res.set(
+                c.name,
+                c.value[c.value.length - 1] +
+                    (1 / 6) * allK.get(c.name)[0] + //k1
+                    (2 / 6) * allK.get(c.name)[1] + //k2
+                    (2 / 6) * allK.get(c.name)[2] + //k3
+                    (1 / 6) * allK.get(c.name)[3], //k4
+            );
+        });
+        this.timeStep = this.timeStep + this.stepSize;
+        return {
+            result: res,
+            timeStep: this.timeStep,
+        };
+    }
+
+    evaluateExpression(exp: string, variables: Map<string, number>): number {
+        return Evaluator.evaluate(exp, Object.fromEntries(variables));
+    }
+}
+
 export class BulirschStoerMethod implements Solver {
     stepSize: number;
     timeStep: number;
