@@ -113,6 +113,7 @@ export default class Main extends React.Component<IProps, IState> {
         var h = this.state.stepSize / n;
         var interVariables = new Map(variables); //contains variables for intermediary steps
         var midpoints: Map<string, number[]> = new Map();
+        var lastPoint: Map<string, number> = new Map();
 
         //z0 == yn == current state
         //z1 = z0 + h * f(x, z0)
@@ -139,7 +140,44 @@ export default class Main extends React.Component<IProps, IState> {
         this.state.model.compartments.forEach((c) => {
             var k = this.evaluateExpression(c.ODE, interVariables);
             var zm = (1 / 2) * (midpoints.get(c.name)![n] + midpoints.get(c.name)![n - 1] + h * k);
-            c.value.push(zm);
+            lastPoint.set(c.name, zm);
+        });
+        return lastPoint;
+    }
+
+    //Bulirsch-Stoer Method
+    bulirschStoerMethod(variables: Map<string, number>) {
+        var depth = 4;
+
+        var triangleMatrix: Map<string, number>[][] = [];
+        for (let n = 0; n < depth; n++) {
+            //rows
+            triangleMatrix[n] = [];
+            for (let m = 0; m <= n; m++) {
+                //columns
+                if (m === 0) {
+                    //steps = 2(i+1)
+                    triangleMatrix[n][m] = this.modifiedMidpointMethod(variables, 2 * (n + 1));
+                } else {
+                    var Rnm: Map<string, number> = new Map();
+                    this.state.model.compartments.forEach((c) => {
+                        var val =
+                            triangleMatrix[n][m - 1].get(c.name)! +
+                            (triangleMatrix[n][m - 1].get(c.name)! - triangleMatrix[n - 1][m - 1].get(c.name)!) /
+                                ((n / (n - 1)) ** (2 * m) - 1);
+                        Rnm.set(c.name, val);
+                    });
+                    triangleMatrix[n][m] = Rnm;
+                }
+            }
+        }
+
+        return triangleMatrix[triangleMatrix.length - 1][triangleMatrix[triangleMatrix.length - 1].length - 1];
+    }
+
+    applyResult(res: Map<string, number>) {
+        this.state.model.compartments.forEach((c) => {
+            c.value.push(res.get(c.name)!);
         });
     }
 
@@ -153,7 +191,8 @@ export default class Main extends React.Component<IProps, IState> {
             //this.euler(variables);
             //this.rungeKutta2(variables);
             //this.rungeKutta4(variables);
-            this.modifiedMidpointMethod(variables, 8);
+            //this.applyResult(this.modifiedMidpointMethod(variables, 8));
+            this.applyResult(this.bulirschStoerMethod(variables));
             //save Timestamps for variable step size
             this.state.timeSteps.push(this.state.timeSteps[this.state.currentTick + i] + this.state.stepSize);
         }
