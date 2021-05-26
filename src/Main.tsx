@@ -1,5 +1,6 @@
 import React from "react";
 import { CModel } from "./Types";
+import { BulirschStoerMethod, Result, Solver } from "./Solver";
 import MyChart from "./Chart";
 import Graph from "./Graph";
 import ParserModule from "./ParserModule";
@@ -12,8 +13,9 @@ interface IProps {}
 interface IState {
     model: CModel;
     timeSteps: number[];
-    stepSize: number;
     currentTick: number;
+    stepSize: number;
+    solver: Solver;
 }
 
 export default class Main extends React.Component<IProps, IState> {
@@ -21,16 +23,22 @@ export default class Main extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             model: { parameters: [], compartments: [] },
-            stepSize: 0.1,
             currentTick: 0,
             timeSteps: [],
+            stepSize: 0.1,
+            solver: new BulirschStoerMethod(0, 0, 0, { parameters: [], compartments: [] }),
         };
     }
 
     componentDidMount() {}
 
     setModel = (newModel: CModel) => {
-        this.setState({ model: newModel, currentTick: 0, timeSteps: [0] });
+        this.setState({
+            model: newModel,
+            currentTick: 0,
+            timeSteps: [0],
+            solver: new BulirschStoerMethod(this.state.stepSize, 0, 4, newModel),
+        });
     };
 
     onClick = () => {
@@ -106,79 +114,12 @@ export default class Main extends React.Component<IProps, IState> {
         });
     }
 
-    //modified midpoint method
-    modifiedMidpointMethod(variables: Map<string, number>, n: number) {
-        //stepSize == H
-        //h == H/n
-        var h = this.state.stepSize / n;
-        var interVariables = new Map(variables); //contains variables for intermediary steps
-        var midpoints: Map<string, number[]> = new Map();
-        var lastPoint: Map<string, number> = new Map();
-
-        //z0 == yn == current state
-        //z1 = z0 + h * f(x, z0)
+    applyResult(res: Result) {
         this.state.model.compartments.forEach((c) => {
-            var k = this.evaluateExpression(c.ODE, interVariables);
-            var z1 = c.value[c.value.length - 1] + h * k;
-
-            interVariables.set(c.name, z1);
-            midpoints.set(c.name, [c.value[c.value.length - 1], z1]);
+            c.value.push(res.result.get(c.name)!);
         });
-
-        //zm+1 = zm−1 + 2h ∗ f(x + m ∗ h, zm) with m = 1, 2, ..., n − 1
-        for (let m = 1; m < n; m++) {
-            this.state.model.compartments.forEach((c) => {
-                var k = this.evaluateExpression(c.ODE, interVariables);
-                var zm1 = midpoints.get(c.name)![m - 1] + 2 * h * k;
-
-                interVariables.set(c.name, zm1);
-                midpoints.get(c.name)!.push(zm1);
-            });
-        }
-
-        //y(x + H) ≈ yn ≡ 1/2*(zn + zn−1 + h ∗ f(x + H, zn))
-        this.state.model.compartments.forEach((c) => {
-            var k = this.evaluateExpression(c.ODE, interVariables);
-            var zm = (1 / 2) * (midpoints.get(c.name)![n] + midpoints.get(c.name)![n - 1] + h * k);
-            lastPoint.set(c.name, zm);
-        });
-        return lastPoint;
-    }
-
-    //Bulirsch-Stoer Method
-    bulirschStoerMethod(variables: Map<string, number>) {
-        var depth = 4;
-
-        var triangleMatrix: Map<string, number>[][] = [];
-        for (let n = 0; n < depth; n++) {
-            //rows
-            triangleMatrix[n] = [];
-            for (let m = 0; m <= n; m++) {
-                //columns
-                if (m === 0) {
-                    //steps = 2(i+1)
-                    triangleMatrix[n][m] = this.modifiedMidpointMethod(variables, 2 * (n + 1));
-                } else {
-                    var Rnm: Map<string, number> = new Map();
-                    this.state.model.compartments.forEach((c) => {
-                        var val =
-                            triangleMatrix[n][m - 1].get(c.name)! +
-                            (triangleMatrix[n][m - 1].get(c.name)! - triangleMatrix[n - 1][m - 1].get(c.name)!) /
-                                ((n / (n - 1)) ** (2 * m) - 1);
-                        Rnm.set(c.name, val);
-                    });
-                    triangleMatrix[n][m] = Rnm;
-                }
-            }
-        }
-
-        return triangleMatrix[triangleMatrix.length - 1][triangleMatrix[triangleMatrix.length - 1].length - 1];
-    }
-
-    applyResult(res: Map<string, number>) {
-        this.state.model.compartments.forEach((c) => {
-            c.value.push(res.get(c.name)!);
-        });
+        //save Timestamps for variable step size
+        this.state.timeSteps.push(res.timeStep);
     }
 
     //Main for solvers
@@ -191,10 +132,7 @@ export default class Main extends React.Component<IProps, IState> {
             //this.euler(variables);
             //this.rungeKutta2(variables);
             //this.rungeKutta4(variables);
-            //this.applyResult(this.modifiedMidpointMethod(variables, 8));
-            this.applyResult(this.bulirschStoerMethod(variables));
-            //save Timestamps for variable step size
-            this.state.timeSteps.push(this.state.timeSteps[this.state.currentTick + i] + this.state.stepSize);
+            this.applyResult(this.state.solver.execute(variables));
         }
         //endCurrentTick
         this.setState({ currentTick: this.state.currentTick + steps });
