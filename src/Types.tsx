@@ -1,3 +1,5 @@
+import { Expression } from "expr-eval";
+
 export interface CModel {
     parameters: Parameter[];
     compartments: Compartment[];
@@ -6,7 +8,7 @@ export interface CModel {
 export interface Compartment {
     name: string;
     value: number[];
-    ODE: string;
+    ODE: Expression;
 }
 
 export interface Parameter {

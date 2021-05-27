@@ -6,8 +6,6 @@ import Graph from "./Graph";
 import ParserModule from "./ParserModule";
 import Settings from "./Settings";
 
-const Evaluator = require("expr-eval").Parser;
-
 interface IProps {}
 
 interface IState {
@@ -37,7 +35,7 @@ export default class Main extends React.Component<IProps, IState> {
             model: newModel,
             currentTick: 0,
             timeSteps: [0],
-            solver: new BulirschStoerMethod(this.state.stepSize, 0, 4, newModel),
+            solver: new BulirschStoerMethod(this.state.stepSize, 0, newModel, 4),
             //solver: new EulerMethod(this.state.stepSize, 0, newModel),
             //solver: new RungeKutta2Method(this.state.stepSize, 0, newModel),
             //solver: new RungeKutta4Method(this.state.stepSize, 0, newModel),
@@ -67,11 +65,8 @@ export default class Main extends React.Component<IProps, IState> {
     //Main for solvers
     solveSteps(steps: number) {
         for (let i = 0; i < steps; i++) {
-            var variables = new Map();
-            this.state.model.compartments.forEach((c) => variables.set(c.name, c.value[this.state.currentTick + i]));
-            this.state.model.parameters.forEach((p) => variables.set(p.name, p.value)); //TODO insert Constant at parse time
             //calculate Step
-            this.applyResult(this.state.solver.execute(variables));
+            this.applyResult(this.state.solver.execute());
         }
         //endCurrentTick
         this.setState({ currentTick: this.state.currentTick + steps });

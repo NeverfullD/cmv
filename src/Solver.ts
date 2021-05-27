@@ -1,17 +1,12 @@
+import { Expression } from "expr-eval";
 import { CModel } from "./Types";
-
-const Evaluator = require("expr-eval").Parser;
 
 export interface Result {
     result: Map<string, number>;
     timeStep: number;
 }
 
-export interface Solver {
-    execute(variables: Map<string, number>): Result;
-}
-
-export class EulerMethod implements Solver {
+export abstract class Solver {
     stepSize: number;
     timeStep: number;
     model: CModel;
@@ -22,7 +17,22 @@ export class EulerMethod implements Solver {
         this.model = model;
     }
 
-    execute(variables: Map<string, number>) {
+    abstract execute(): Result;
+
+    evaluateExpression(exp: Expression, variables: Map<string, number>): number {
+        return exp.evaluate(Object.fromEntries(variables));
+    }
+
+    generateVariables() {
+        var variables = new Map();
+        this.model.compartments.forEach((c) => variables.set(c.name, c.value[c.value.length - 1]));
+        return variables;
+    }
+}
+
+export class EulerMethod extends Solver {
+    execute() {
+        var variables = this.generateVariables();
         var res: Map<string, number> = new Map();
         this.model.compartments.forEach((c) => {
             var k = this.evaluateExpression(c.ODE, variables) * this.stepSize;
@@ -34,24 +44,11 @@ export class EulerMethod implements Solver {
             timeStep: this.timeStep,
         };
     }
-
-    evaluateExpression(exp: string, variables: Map<string, number>): number {
-        return Evaluator.evaluate(exp, Object.fromEntries(variables));
-    }
 }
 
-export class RungeKutta2Method implements Solver {
-    stepSize: number;
-    timeStep: number;
-    model: CModel;
-
-    constructor(stepSize: number, timeStep: number, model: CModel) {
-        this.stepSize = stepSize;
-        this.timeStep = timeStep;
-        this.model = model;
-    }
-
-    execute(variables: Map<string, number>) {
+export class RungeKutta2Method extends Solver {
+    execute() {
+        var variables = this.generateVariables();
         var res: Map<string, number> = new Map();
         var interVariables = new Map(variables); //contains variable values at half point of the step
         this.model.compartments.forEach((c) => {
@@ -69,24 +66,11 @@ export class RungeKutta2Method implements Solver {
             timeStep: this.timeStep,
         };
     }
-
-    evaluateExpression(exp: string, variables: Map<string, number>): number {
-        return Evaluator.evaluate(exp, Object.fromEntries(variables));
-    }
 }
 
-export class RungeKutta4Method implements Solver {
-    stepSize: number;
-    timeStep: number;
-    model: CModel;
-
-    constructor(stepSize: number, timeStep: number, model: CModel) {
-        this.stepSize = stepSize;
-        this.timeStep = timeStep;
-        this.model = model;
-    }
-
-    execute(variables: Map<string, number>) {
+export class RungeKutta4Method extends Solver {
+    execute() {
+        var variables = this.generateVariables();
         var res: Map<string, number> = new Map();
         var interVariables = new Map(variables); //contains variables for intermediary steps
         var allK = new Map();
@@ -130,29 +114,21 @@ export class RungeKutta4Method implements Solver {
             timeStep: this.timeStep,
         };
     }
-
-    evaluateExpression(exp: string, variables: Map<string, number>): number {
-        return Evaluator.evaluate(exp, Object.fromEntries(variables));
-    }
 }
 
-export class BulirschStoerMethod implements Solver {
-    stepSize: number;
-    timeStep: number;
+export class BulirschStoerMethod extends Solver {
     error: number;
     depth: number;
-    model: CModel;
 
-    constructor(stepSize: number, timeStep: number, depth: number, model: CModel) {
-        this.stepSize = stepSize;
-        this.timeStep = timeStep;
+    constructor(stepSize: number, timeStep: number, model: CModel, depth: number) {
+        super(stepSize, timeStep, model);
         this.error = 0;
         this.depth = depth;
-        this.model = model;
     }
 
     //Bulirsch-Stoer Method
-    execute(variables: Map<string, number>) {
+    execute() {
+        var variables = this.generateVariables();
         const maxError = 0.001;
         const maxDepth = 8; // how many rows to be calculated
 
@@ -163,8 +139,6 @@ export class BulirschStoerMethod implements Solver {
             //error control handling
             //small error decrease depth or increase stepSize
             if (this.error < maxError / 2) {
-                console.log("small error");
-
                 if (this.depth > 2) {
                     this.depth = this.depth - 1;
                 } else {
@@ -220,14 +194,6 @@ export class BulirschStoerMethod implements Solver {
             this.error = errors.reduce((p, c) => p + c, 0) / errors.length;
         } while (this.error > maxError); //end error control loop
         this.timeStep = this.timeStep + this.stepSize;
-        console.log(this.error);
-        console.log(this.stepSize);
-        console.log(this.depth);
-        console.log({
-            result: triangleMatrix[triangleMatrix.length - 1][triangleMatrix[triangleMatrix.length - 1].length - 1],
-            timeStep: this.timeStep,
-        });
-
         return {
             result: triangleMatrix[triangleMatrix.length - 1][triangleMatrix[triangleMatrix.length - 1].length - 1],
             timeStep: this.timeStep,
@@ -271,9 +237,5 @@ export class BulirschStoerMethod implements Solver {
             lastPoint.set(c.name, zm);
         });
         return lastPoint;
-    }
-
-    evaluateExpression(exp: string, variables: Map<string, number>): number {
-        return Evaluator.evaluate(exp, Object.fromEntries(variables));
     }
 }

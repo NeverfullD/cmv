@@ -2,8 +2,9 @@ import React from "react";
 import "./ParserModule.css";
 import { CModel } from "./Types";
 import { Parser, generate } from "peggy";
+const Evaluator = require("expr-eval").Parser;
 
-var modelGrammar = `{{
+const modelGrammar = `{{
 function makeFloat(o) {
     return parseFloat(o.join(""), 10);
 }
@@ -44,7 +45,13 @@ export default class ParserModule extends React.Component<IProps, IState> {
     //Parse Model
     onClick(event: any) {
         //parse Input
-        this.props.setNewModel(this.state.parser.parse(this.state.value));
+        var model: CModel = this.state.parser.parse(this.state.value);
+        //insert constants
+        var constants = new Map();
+        model.parameters.forEach((p) => constants.set(p.name, p.value));
+        model.compartments.forEach((c) => (c.ODE = Evaluator.parse(c.ODE).simplify(Object.fromEntries(constants))));
+        //set model
+        this.props.setNewModel(model);
         event.preventDefault();
     }
 
