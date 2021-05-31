@@ -66,9 +66,6 @@ export default class Main extends React.Component<IProps, IState> {
     };
 
     getSolver(selectedSolver: string, timeStep: number, model: CModel): Solver {
-        console.log(this.state);
-        console.log(selectedSolver);
-
         switch (selectedSolver) {
             case "euler":
                 return new EulerMethod(this.state.stepSize, timeStep, model);

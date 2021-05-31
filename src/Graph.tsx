@@ -31,10 +31,12 @@ export default class Graph extends React.Component<IProps, IState> {
     generateInitialDataStructure() {
         var node: { id: string; size: number }[] = [];
         this.props.model.compartments.forEach((c) => {
-            node.push({ id: c.name, size: c.value[c.value.length - 1] });
+            node.push({ id: c.name, size: 10 });
         });
         var link: { source: string; target: string }[] = [];
-        //this.props.model.reactions.forEach((c) => {            link.push({ source: c.orig, target: c.dest });        });
+        this.props.model.compartments.forEach((c) => {
+            c.ODE.symbols().forEach((sym) => link.push({ source: c.name, target: sym }));
+        });
         return { nodes: node, links: link };
     }
 
