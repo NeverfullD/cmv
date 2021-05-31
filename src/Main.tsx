@@ -14,6 +14,7 @@ interface IState {
     currentTick: number;
     stepSize: number;
     solver: Solver;
+    selectedSolver: string;
 }
 
 export default class Main extends React.Component<IProps, IState> {
@@ -25,25 +26,24 @@ export default class Main extends React.Component<IProps, IState> {
             timeSteps: [],
             stepSize: 0.1,
             solver: new EulerMethod(0, 0, { parameters: [], compartments: [] }),
+            selectedSolver: "euler",
         };
     }
 
     componentDidMount() {}
 
+    onClick = () => {
+        console.log(this.state);
+    };
+
+    //handle Settings
     setModel = (newModel: CModel) => {
         this.setState({
             model: newModel,
             currentTick: 0,
             timeSteps: [0],
-            solver: new BulirschStoerMethod(this.state.stepSize, 0, newModel, 4),
-            //solver: new EulerMethod(this.state.stepSize, 0, newModel),
-            //solver: new RungeKutta2Method(this.state.stepSize, 0, newModel),
-            //solver: new RungeKutta4Method(this.state.stepSize, 0, newModel),
+            solver: this.getSolver(this.state.selectedSolver, 0, newModel),
         });
-    };
-
-    onClick = () => {
-        console.log(this.state.model);
     };
 
     onSimulate = (n: number) => {
@@ -54,6 +54,36 @@ export default class Main extends React.Component<IProps, IState> {
         this.setState({ stepSize: stepSize });
     };
 
+    changeSelectedSolver = (selectedSolver: string) => {
+        this.setState({
+            selectedSolver: selectedSolver,
+            solver: this.getSolver(
+                selectedSolver,
+                this.state.timeSteps[this.state.timeSteps.length - 1],
+                this.state.model,
+            ),
+        });
+    };
+
+    getSolver(selectedSolver: string, timeStep: number, model: CModel): Solver {
+        console.log(this.state);
+        console.log(selectedSolver);
+
+        switch (selectedSolver) {
+            case "euler":
+                return new EulerMethod(this.state.stepSize, timeStep, model);
+            case "rungeKutta2":
+                return new RungeKutta2Method(this.state.stepSize, timeStep, model);
+            case "rungeKutta4":
+                return new RungeKutta4Method(this.state.stepSize, timeStep, model);
+            case "bulirschStoer":
+                return new BulirschStoerMethod(this.state.stepSize, timeStep, model, 4);
+            default:
+                return new EulerMethod(this.state.stepSize, timeStep, model);
+        }
+    }
+
+    //simulation Core
     applyResult(res: Result) {
         this.state.model.compartments.forEach((c) => {
             c.value.push(res.result.get(c.name)!);
@@ -83,6 +113,8 @@ export default class Main extends React.Component<IProps, IState> {
                     onSimulate={this.onSimulate}
                     changeStepSize={this.changeStepSize}
                     stepSize={this.state.stepSize}
+                    selectedSolver={this.state.selectedSolver}
+                    changeSelectedSolver={this.changeSelectedSolver}
                 />
                 <MyChart
                     model={this.state.model}

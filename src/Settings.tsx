@@ -5,6 +5,8 @@ interface IProps {
     onSimulate: (n: number) => void;
     changeStepSize: (stepSize: number) => void;
     stepSize: number;
+    selectedSolver: string;
+    changeSelectedSolver: (selectedSolver: string) => void;
 }
 
 interface IState {
@@ -46,6 +48,10 @@ export default class Settings extends React.Component<IProps, IState> {
         this.setState({ stepSize: event.target.value });
     };
 
+    handleSelectedSolver = (event: any) => {
+        this.props.changeSelectedSolver(event.target.value);
+    };
+
     componentDidMount() {}
 
     render() {
@@ -62,6 +68,14 @@ export default class Settings extends React.Component<IProps, IState> {
                 <br />
                 <button onClick={this.onChangeStepSize}>Change Step Size (currently: {this.props.stepSize}): </button>
                 <input type="text" value={this.state.stepSize} onChange={this.handleChangeStepSize} />
+                <br />
+                <label>Choose a Solver:</label>
+                <select value={this.props.selectedSolver} onChange={this.handleSelectedSolver}>
+                    <option value="euler">Euler</option>
+                    <option value="rungeKutta2">Runge-Kutta 2.Order</option>
+                    <option value="rungeKutta4">Runge-Kutta 4.Order</option>
+                    <option value="bulirschStoer">Bulirsch-Stoer</option>
+                </select>
             </div>
         );
     }
