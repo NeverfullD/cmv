@@ -24,7 +24,7 @@ export abstract class Solver {
     }
 
     generateVariables() {
-        var variables = new Map();
+        var variables: Map<string, number> = new Map();
         this.model.compartments.forEach((c) => variables.set(c.name, c.value[c.value.length - 1]));
         return variables;
     }
@@ -113,6 +113,86 @@ export class RungeKutta4Method extends Solver {
             result: res,
             timeStep: this.timeStep,
         };
+    }
+}
+
+export class RungeKutta4AutomaticMethod extends Solver {
+    error: number;
+
+    constructor(stepSize: number, timeStep: number, model: CModel) {
+        super(stepSize, timeStep, model);
+        this.error = 0;
+    }
+
+    execute() {
+        var errors: number[] = [];
+        const maxError = 0.01;
+        var variables = this.generateVariables();
+        do {
+            //error control handling
+            //small error increase stepSize
+            if (this.error < maxError / 4) {
+                this.stepSize = this.stepSize * 2;
+            }
+            //big error decrease stepSize
+            else if (this.error > maxError) {
+                this.stepSize = this.stepSize / 2;
+            }
+            var resOneStep = this.calculateStep(variables, this.stepSize);
+            var resTwoStep = this.calculateStep(this.calculateStep(variables, this.stepSize / 2), this.stepSize / 2);
+
+            Array.from(resOneStep.values()).forEach((v, i) => {
+                errors.push(Math.abs(Array.from(resTwoStep.values())[i] - v));
+            });
+            this.error = errors.reduce((p, c) => p + c, 0) / errors.length;
+        } while (this.error > maxError);
+
+        this.timeStep = this.timeStep + this.stepSize;
+        return {
+            result: resTwoStep,
+            timeStep: this.timeStep,
+        };
+    }
+
+    calculateStep(variables: Map<string, number>, stepSize: number) {
+        var res: Map<string, number> = new Map();
+        var interVariables = new Map(variables); //contains variables for intermediary steps
+        var allK = new Map();
+        //calc k1
+        this.model.compartments.forEach((c) => {
+            var k1 = this.evaluateExpression(c.ODE, variables) * stepSize;
+            interVariables.set(c.name, variables.get(c.name)! + k1 / 2);
+            allK.set(c.name, [k1]);
+        });
+        //calc k2
+        this.model.compartments.forEach((c) => {
+            var k2 = this.evaluateExpression(c.ODE, interVariables) * stepSize;
+            interVariables.set(c.name, variables.get(c.name)! + k2 / 2);
+            allK.get(c.name).push(k2);
+        });
+        //calc k3
+        this.model.compartments.forEach((c) => {
+            var k3 = this.evaluateExpression(c.ODE, interVariables) * stepSize;
+            interVariables.set(c.name, variables.get(c.name)! + k3);
+            allK.get(c.name).push(k3);
+        });
+        //calc k4
+        this.model.compartments.forEach((c) => {
+            var k4 = this.evaluateExpression(c.ODE, interVariables) * stepSize;
+            allK.get(c.name).push(k4);
+        });
+        //calc y_n+1
+        this.model.compartments.forEach((c) => {
+            res.set(
+                c.name,
+                variables.get(c.name)! +
+                    (1 / 6) * allK.get(c.name)[0] + //k1
+                    (2 / 6) * allK.get(c.name)[1] + //k2
+                    (2 / 6) * allK.get(c.name)[2] + //k3
+                    (1 / 6) * allK.get(c.name)[3], //k4
+            );
+        });
+        return res;
     }
 }
 

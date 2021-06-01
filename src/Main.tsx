@@ -1,6 +1,14 @@
 import React from "react";
 import { CModel } from "./Types";
-import { BulirschStoerMethod, EulerMethod, Result, RungeKutta2Method, RungeKutta4Method, Solver } from "./Solver";
+import {
+    BulirschStoerMethod,
+    EulerMethod,
+    Result,
+    RungeKutta2Method,
+    RungeKutta4AutomaticMethod,
+    RungeKutta4Method,
+    Solver,
+} from "./Solver";
 import MyChart from "./Chart";
 import Graph from "./Graph";
 import ParserModule from "./ParserModule";
@@ -73,6 +81,8 @@ export default class Main extends React.Component<IProps, IState> {
                 return new RungeKutta2Method(this.state.stepSize, timeStep, model);
             case "rungeKutta4":
                 return new RungeKutta4Method(this.state.stepSize, timeStep, model);
+            case "rungeKutta4Automatic":
+                return new RungeKutta4AutomaticMethod(this.state.stepSize, timeStep, model);
             case "bulirschStoer":
                 return new BulirschStoerMethod(this.state.stepSize, timeStep, model, 4);
             default:

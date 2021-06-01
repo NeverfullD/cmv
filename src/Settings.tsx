@@ -74,6 +74,7 @@ export default class Settings extends React.Component<IProps, IState> {
                     <option value="euler">Euler</option>
                     <option value="rungeKutta2">Runge-Kutta 2.Order</option>
                     <option value="rungeKutta4">Runge-Kutta 4.Order</option>
+                    <option value="rungeKutta4Automatic">Runge-Kutta 4.Order Automatic</option>
                     <option value="bulirschStoer">Bulirsch-Stoer</option>
                 </select>
             </div>
