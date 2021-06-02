@@ -61,16 +61,29 @@ export default class ParserModule extends React.Component<IProps, IState> {
             model.compartments.forEach((c) => (c.ODE = Evaluator.parse(c.ODE).simplify(Object.fromEntries(constants))));
             //set model
             this.props.setNewModel(model);
-            //no error
+            //error control
             this.setState({ error: { hasError: false, message: "", location: "" } });
-        } catch (error) {
-            this.setState({
-                error: {
-                    hasError: true,
-                    message: error.message,
-                    location: "at line: " + error.location.start.line + " at column: " + error.location.start.column,
-                },
+
+            var variables = new Map();
+            model.compartments.forEach((p) => variables.set(p.name, p.value[0]));
+            model.compartments.forEach((c) => {
+                try {
+                    c.ODE.evaluate(Object.fromEntries(variables));
+                } catch (error) {
+                    this.setState({ error: { hasError: true, message: error.message, location: "ODE for " + c.name } });
+                    console.log(error);
+                }
             });
+        } catch (error) {
+            if (error.location !== undefined)
+                this.setState({
+                    error: {
+                        hasError: true,
+                        message: error.message,
+                        location:
+                            "at line: " + error.location.start.line + " at column: " + error.location.start.column,
+                    },
+                });
 
             console.log(error);
         }
