@@ -34,3 +34,5 @@ Example
 -   Technical
     -   Initialize chart to remove error message
     -   add configuration file
+    -   add default models
+    -   add local model store
