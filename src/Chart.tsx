@@ -2,6 +2,7 @@ import React from "react";
 import Chart from "react-google-charts";
 
 import "./Chart.css";
+import { CsvDataService } from "./CSVDataService";
 import { CModel } from "./Types";
 
 interface IProps {
@@ -11,7 +12,7 @@ interface IProps {
 }
 
 interface IState {
-    data: any[];
+    data: [any[]];
 }
 
 export default class MyChart extends React.Component<IProps, IState> {
@@ -24,10 +25,11 @@ export default class MyChart extends React.Component<IProps, IState> {
     }
 
     generateData() {
-        var data: any[] = [];
-        var header = ["x"];
+        var header: any[] = ["x"];
         this.props.model.compartments.forEach((c) => header.push(c.name));
-        data.push(header);
+
+        var data: [any[]] = [header];
+
         for (let i = 0; i <= this.props.currentTick; i++) {
             var dataPoint = [this.props.timeSteps[i]];
             this.props.model.compartments.forEach((c) => dataPoint.push(c.value[i]));
@@ -40,7 +42,9 @@ export default class MyChart extends React.Component<IProps, IState> {
 
     componentDidMount() {}
 
-    onClick() {}
+    onClickGetData = () => {
+        CsvDataService.exportToCsv("data.csv", this.state.data);
+    };
 
     render() {
         return (
@@ -62,9 +66,7 @@ export default class MyChart extends React.Component<IProps, IState> {
                     }}
                     rootProps={{ "data-testid": "2" }}
                 />
-                {
-                    //<button onClick={this.onClick.bind(this)}>Test</button>
-                }
+                <button onClick={this.onClickGetData}>Get Data</button>
             </div>
         );
     }
