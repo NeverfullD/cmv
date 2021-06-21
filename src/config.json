@@ -1,0 +1,27 @@
+{
+    "title": "Compartment Model Visualizer",
+
+    "writeModelTitle": "Write a Model",
+    "howToWriteModelTitle": "How to Write a Model",
+    "loadModelTitle": "Or Load a Model",
+    "modelTextAreaPlaceholder": "Write DSL Here",
+    "loadModelButton": "Load Model into Simulator",
+    "reloadModelButton": "Reload Model and Reset Simulator",
+    "saveModelButton": "Save Model",
+
+    "solverTitle": "Solver",
+    "setStepSizeButton": "Set Step Size",
+    "timeControlTitle": "Time Control",
+    "simulateForButton": "SimulateFor",
+
+    "models": [
+        {
+            "name": "Custom",
+            "value": ""
+        },
+        {
+            "name": "SIR",
+            "value": "(param alpha 0.75)\n(param beta 0.1)\n(param N 10000)\n\n(comp S 9999 {-alpha*S*I/N})\n(comp I 1 {alpha*S*I/N - beta*I})\n(comp R 0 {beta*I})"
+        }
+    ]
+}

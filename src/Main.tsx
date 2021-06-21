@@ -13,6 +13,7 @@ import MyChart from "./Chart";
 import Graph from "./Graph";
 import ParserModule from "./ParserModule";
 import Settings from "./Settings";
+import * as config from "./config.json";
 
 interface IProps {}
 
@@ -41,7 +42,8 @@ export default class Main extends React.Component<IProps, IState> {
     componentDidMount() {}
 
     onClick = () => {
-        console.log(this.state);
+        //console.log(this.state);
+        console.log(config);
     };
 
     //handle Settings
@@ -112,9 +114,8 @@ export default class Main extends React.Component<IProps, IState> {
     render() {
         return (
             <div>
-                Test
                 <button onClick={this.onClick}>Test</button>
-                <a href="https://github.com/NeverfullD/cmv">to Github</a>
+                <h2>{config.title}</h2>
                 <ParserModule setNewModel={this.setModel} />
                 <Settings
                     onSimulate={this.onSimulate}

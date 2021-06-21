@@ -2,6 +2,8 @@ import React from "react";
 import "./ParserModule.css";
 import { CModel } from "./Types";
 import { Parser, generate } from "peggy";
+import * as config from "./config.json";
+
 const Evaluator = require("expr-eval").Parser;
 
 const modelGrammar = `{{
@@ -32,26 +34,24 @@ interface IState {
     value: string;
     parser: Parser;
     error: ParseError;
+    loadedModel: boolean;
+    selectedModel: number;
 }
 
 export default class ParserModule extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            value: `(param alpha 0.75)
-(param beta 0.1)
-(param N 10000)
-
-(comp S 9999 {-alpha*S*I/N})
-(comp I 1 {alpha*S*I/N - beta*I})
-(comp R 0 {beta*I})`,
+            value: "",
             parser: generate(modelGrammar),
             error: { hasError: false, message: "", location: "" },
+            loadedModel: false,
+            selectedModel: 0,
         };
     }
 
     //Parse Model
-    onClick(event: any) {
+    onLoadModel = (event: any) => {
         //parse Input
         try {
             var model: CModel = this.state.parser.parse(this.state.value);
@@ -74,6 +74,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
                     console.log(error);
                 }
             });
+            this.setState({ loadedModel: true });
         } catch (error) {
             if (error.location !== undefined)
                 this.setState({
@@ -89,13 +90,17 @@ export default class ParserModule extends React.Component<IProps, IState> {
         }
 
         event.preventDefault();
-    }
+    };
 
     handleChange(event: any) {
         this.setState({ value: event.target.value });
     }
 
     componentDidMount() {}
+
+    handleSelectedModel = (event: any) => {
+        this.setState({ selectedModel: event.target.value, value: config.models[event.target.value].value });
+    };
 
     renderError() {
         if (this.state.error.hasError) {
@@ -107,25 +112,44 @@ export default class ParserModule extends React.Component<IProps, IState> {
         }
     }
 
+    generateDropdownOptions() {
+        var options: any[] = [];
+        config.models.forEach((model, i) =>
+            options.push(
+                <option key={i} value={i}>
+                    {model.name}
+                </option>,
+            ),
+        );
+
+        return options;
+    }
+
     render() {
         var error = this.renderError();
+
         return (
             <div className="parser">
-                Parser
+                {config.writeModelTitle}: <a href="https://github.com/NeverfullD/cmv">{config.howToWriteModelTitle}</a>
+                <br />
+                {config.loadModelTitle}:{" "}
+                <select value={this.state.selectedModel} onChange={this.handleSelectedModel}>
+                    {this.generateDropdownOptions()}
+                </select>
+                <br />
+                <textarea
+                    className="parserText"
+                    placeholder={config.modelTextAreaPlaceholder}
+                    value={this.state.value}
+                    onChange={this.handleChange.bind(this)}
+                />
+                <br />
+                <button onClick={this.onLoadModel}>
+                    {this.state.loadedModel ? config.reloadModelButton : config.loadModelButton}
+                </button>
+                <button>{config.saveModelButton}</button>
+                <br />
                 {error}
-                <form onSubmit={this.onClick.bind(this)}>
-                    <label>
-                        Model:
-                        <br />
-                        <textarea
-                            className="parserText"
-                            value={this.state.value}
-                            onChange={this.handleChange.bind(this)}
-                        />
-                    </label>
-                    <br />
-                    <input type="submit" value="Submit" />
-                </form>
             </div>
         );
     }
