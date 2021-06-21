@@ -21,7 +21,7 @@
         },
         {
             "name": "SIR",
-            "value": "(param alpha 0.75)\n(param beta 0.1)\n(param N 10000)\n\n(comp S 9999 {-alpha*S*I/N})\n(comp I 1 {alpha*S*I/N - beta*I})\n(comp R 0 {beta*I})"
+            "value": "param alpha 0.75\nparam beta 0.1\nparam N 10000\n\ncomp S 9999 {-alpha*S*I/N}\ncomp I 1 {alpha*S*I/N - beta*I}\ncomp R 0 {beta*I}"
         }
     ]
 }

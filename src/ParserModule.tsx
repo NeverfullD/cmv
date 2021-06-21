@@ -13,8 +13,8 @@ function makeFloat(o) {
 }}
 
 model = parameters:parameter* _ compartments:compartment+ {return {parameters, compartments};}
-compartment = "(" _ "comp" _ name:ident _ value:value _ ODE:calc _ ")" _ {return {name, value:[value], ODE};}
-parameter = "(" _ "param" _ name:ident _ value:value _ ")" _ {return {name, value};}
+compartment = "comp" _ name:ident _ value:value _ ODE:calc _ {return {name, value:[value], ODE};}
+parameter = "param" _ name:ident _ value:value _ {return {name, value};}
 ident = ident:[A-Za-z]+ {return ident.join("")}
 value = digits:[0-9.]+ {return makeFloat(digits);}
 _ "whitespace" = [ \\t\\n\\r]*
