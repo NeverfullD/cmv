@@ -36,17 +36,21 @@ interface IState {
     error: ParseError;
     loadedModel: boolean;
     selectedModel: number;
+    customModels: { name: string; value: string }[];
 }
 
 export default class ParserModule extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
+        var retrievedModels = localStorage.getItem("savedModels");
+        console.log(retrievedModels);
         this.state = {
             value: "",
             parser: generate(modelGrammar),
             error: { hasError: false, message: "", location: "" },
             loadedModel: false,
             selectedModel: 0,
+            customModels: retrievedModels ? JSON.parse(retrievedModels) : [],
         };
     }
 
@@ -85,10 +89,8 @@ export default class ParserModule extends React.Component<IProps, IState> {
                             "at line: " + error.location.start.line + " at column: " + error.location.start.column,
                     },
                 });
-
             console.log(error);
         }
-
         event.preventDefault();
     };
 
@@ -99,7 +101,19 @@ export default class ParserModule extends React.Component<IProps, IState> {
     componentDidMount() {}
 
     handleSelectedModel = (event: any) => {
-        this.setState({ selectedModel: event.target.value, value: config.models[event.target.value].value });
+        this.setState({
+            selectedModel: event.target.value,
+            value: config.models.concat(this.state.customModels)[event.target.value].value,
+        });
+    };
+
+    onSaveModel = () => {
+        this.state.customModels.push({
+            name: "Custom Model " + this.state.customModels.length,
+            value: this.state.value,
+        });
+        localStorage.setItem("savedModels", JSON.stringify(this.state.customModels));
+        this.setState({ selectedModel: this.state.customModels.length + 1 });
     };
 
     renderError() {
@@ -114,7 +128,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
 
     generateDropdownOptions() {
         var options: any[] = [];
-        config.models.forEach((model, i) =>
+        config.models.concat(this.state.customModels).forEach((model, i) =>
             options.push(
                 <option key={i} value={i}>
                     {model.name}
@@ -147,7 +161,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
                 <button onClick={this.onLoadModel}>
                     {this.state.loadedModel ? config.reloadModelButton : config.loadModelButton}
                 </button>
-                <button>{config.saveModelButton}</button>
+                <button onClick={this.onSaveModel}>{config.saveModelButton}</button>
                 <br />
                 {error}
             </div>
