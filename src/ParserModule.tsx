@@ -43,7 +43,6 @@ export default class ParserModule extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         var retrievedModels = localStorage.getItem("savedModels");
-        console.log(retrievedModels);
         this.state = {
             value: "",
             parser: generate(modelGrammar),

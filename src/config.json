@@ -11,8 +11,9 @@
 
     "solverTitle": "Solver",
     "setStepSizeButton": "Set Step Size",
+    "setMaxErrorButton": "Set Max Error Rate",
     "timeControlTitle": "Time Control",
-    "simulateForButton": "SimulateFor",
+    "simulateForButton": "Simulate for",
 
     "models": [
         {

@@ -22,6 +22,7 @@ interface IState {
     timeSteps: number[];
     currentTick: number;
     stepSize: number;
+    maxError: number;
     solver: Solver;
     selectedSolver: string;
 }
@@ -34,6 +35,7 @@ export default class Main extends React.Component<IProps, IState> {
             currentTick: 0,
             timeSteps: [],
             stepSize: 0.1,
+            maxError: 0.001,
             solver: new EulerMethod(0, 0, { parameters: [], compartments: [] }),
             selectedSolver: "euler",
         };
@@ -57,11 +59,15 @@ export default class Main extends React.Component<IProps, IState> {
     };
 
     onSimulate = (n: number) => {
-        this.solveSteps(n);
+        this.solveTime(n);
     };
 
     changeStepSize = (stepSize: number) => {
         this.setState({ stepSize: stepSize });
+    };
+
+    changeMaxError = (maxError: number) => {
+        this.setState({ maxError: maxError });
     };
 
     changeSelectedSolver = (selectedSolver: string) => {
@@ -84,9 +90,9 @@ export default class Main extends React.Component<IProps, IState> {
             case "rungeKutta4":
                 return new RungeKutta4Method(this.state.stepSize, timeStep, model);
             case "rungeKutta4Automatic":
-                return new RungeKutta4AutomaticMethod(this.state.stepSize, timeStep, model);
+                return new RungeKutta4AutomaticMethod(this.state.stepSize, timeStep, model, this.state.maxError);
             case "bulirschStoer":
-                return new BulirschStoerMethod(this.state.stepSize, timeStep, model, 4);
+                return new BulirschStoerMethod(this.state.stepSize, timeStep, model, 4, this.state.maxError);
             default:
                 return new EulerMethod(this.state.stepSize, timeStep, model);
         }
@@ -102,10 +108,13 @@ export default class Main extends React.Component<IProps, IState> {
     }
 
     //Main for solvers
-    solveSteps(steps: number) {
-        for (let i = 0; i < steps; i++) {
+    solveTime(time: number) {
+        var steps = 0;
+        var endTime = this.state.timeSteps[this.state.timeSteps.length - 1] + time;
+        while (this.state.timeSteps[this.state.timeSteps.length - 1] < endTime) {
             //calculate Step
             this.applyResult(this.state.solver.execute());
+            steps++;
         }
         //endCurrentTick
         this.setState({ currentTick: this.state.currentTick + steps });
@@ -120,7 +129,9 @@ export default class Main extends React.Component<IProps, IState> {
                 <Settings
                     onSimulate={this.onSimulate}
                     changeStepSize={this.changeStepSize}
+                    changeMaxError={this.changeMaxError}
                     stepSize={this.state.stepSize}
+                    maxError={this.state.maxError}
                     selectedSolver={this.state.selectedSolver}
                     changeSelectedSolver={this.changeSelectedSolver}
                 />

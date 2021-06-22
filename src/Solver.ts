@@ -124,24 +124,25 @@ export class RungeKutta4Method extends RungeKutta4Base {
 
 export class RungeKutta4AutomaticMethod extends RungeKutta4Base {
     error: number;
+    maxError: number;
 
-    constructor(stepSize: number, timeStep: number, model: CModel) {
+    constructor(stepSize: number, timeStep: number, model: CModel, maxError: number) {
         super(stepSize, timeStep, model);
         this.error = 0;
+        this.maxError = maxError;
     }
 
     execute() {
         var errors: number[] = [];
-        const maxError = 0.01;
         var variables = this.generateVariables();
         do {
             //error control handling
             //small error increase stepSize
-            if (this.error < maxError / 4) {
+            if (this.error < this.maxError / 4) {
                 this.stepSize = this.stepSize * 2;
             }
             //big error decrease stepSize
-            else if (this.error > maxError) {
+            else if (this.error > this.maxError) {
                 this.stepSize = this.stepSize / 2;
             }
             var resOneStep = this.calculateStep(variables, this.stepSize);
@@ -151,7 +152,7 @@ export class RungeKutta4AutomaticMethod extends RungeKutta4Base {
                 errors.push(Math.abs(Array.from(resTwoStep.values())[i] - v));
             });
             this.error = errors.reduce((p, c) => p + c, 0) / errors.length;
-        } while (this.error > maxError);
+        } while (this.error > this.maxError);
 
         this.timeStep = this.timeStep + this.stepSize;
         return {
@@ -164,17 +165,18 @@ export class RungeKutta4AutomaticMethod extends RungeKutta4Base {
 export class BulirschStoerMethod extends Solver {
     error: number;
     depth: number;
+    maxError: number;
 
-    constructor(stepSize: number, timeStep: number, model: CModel, depth: number) {
+    constructor(stepSize: number, timeStep: number, model: CModel, depth: number, maxError: number) {
         super(stepSize, timeStep, model);
         this.error = 0;
         this.depth = depth;
+        this.maxError = maxError;
     }
 
     //Bulirsch-Stoer Method
     execute() {
         var variables = this.generateVariables();
-        const maxError = 0.001;
         const maxDepth = 8; // how many rows to be calculated
 
         var triangleMatrix: Map<string, number>[][] = [];
@@ -183,7 +185,7 @@ export class BulirschStoerMethod extends Solver {
         do {
             //error control handling
             //small error decrease depth or increase stepSize
-            if (this.error < maxError / 2) {
+            if (this.error < this.maxError / 2) {
                 if (this.depth > 2) {
                     this.depth = this.depth - 1;
                 } else {
@@ -192,7 +194,7 @@ export class BulirschStoerMethod extends Solver {
                 }
             }
             //big error increase depth or decrease stepSize
-            else if (this.error > maxError) {
+            else if (this.error > this.maxError) {
                 if (this.depth < maxDepth) {
                     this.depth = this.depth + 1;
                 } else {
@@ -237,7 +239,7 @@ export class BulirschStoerMethod extends Solver {
                 } //end inner loop
             } //end outer loop
             this.error = errors.reduce((p, c) => p + c, 0) / errors.length;
-        } while (this.error > maxError); //end error control loop
+        } while (this.error > this.maxError); //end error control loop
         this.timeStep = this.timeStep + this.stepSize;
         return {
             result: triangleMatrix[triangleMatrix.length - 1][triangleMatrix[triangleMatrix.length - 1].length - 1],
