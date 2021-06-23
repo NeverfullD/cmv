@@ -5,7 +5,7 @@ import "./Graph.css";
 import { CModel } from "./Types";
 
 interface NodeType extends NodeObject {
-    size: number;
+    value: number;
 }
 
 interface IProps {
@@ -13,7 +13,7 @@ interface IProps {
 }
 
 interface IState {
-    data: { nodes: { id: string; size: number }[]; links: { source: string; target: string }[] };
+    data: { nodes: { id: string; value: number }[]; links: { source: string; target: string }[] };
 }
 
 export default class Graph extends React.Component<IProps, IState> {
@@ -29,9 +29,9 @@ export default class Graph extends React.Component<IProps, IState> {
     }
 
     generateInitialDataStructure() {
-        var node: { id: string; size: number }[] = [];
+        var node: { id: string; value: number }[] = [];
         this.props.model.compartments.forEach((c) => {
-            node.push({ id: c.name, size: 10 });
+            node.push({ id: c.name, value: c.value[c.value.length - 1] });
         });
         var link: { source: string; target: string }[] = [];
         this.props.model.compartments.forEach((c) => {
@@ -44,14 +44,43 @@ export default class Graph extends React.Component<IProps, IState> {
 
     onClick() {}
 
+    getRandomInt = (max: number) => {
+        return Math.floor(Math.random() * max);
+    };
+
+    nodePaint = (node: NodeObject, ctx: CanvasRenderingContext2D) => {
+        ctx.fillStyle =
+            "#" +
+            (
+                (node
+                    .id!.toString()
+                    .split("")
+                    .map((x) => x.codePointAt(0)!)
+                    .reduce((a, b) => a + b) *
+                    1234567) %
+                Math.pow(2, 24)
+            )
+                .toString(16)
+                .padStart(6, "0");
+        ctx.beginPath();
+        ctx.arc(node.x!, node.y!, 10, 0, 2 * Math.PI, false);
+        ctx.fill();
+        ctx.fillStyle = "#000000";
+        ctx.font = "10px Sans-Serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(node.id!.toString(), node.x!, node.y!);
+        // text
+    };
+
     render() {
         return (
             <div className="graph">
                 Graph
                 <ForceGraph2D
                     graphData={this.state.data}
-                    nodeLabel="id"
-                    nodeVal={(node) => (node as NodeType).size}
+                    nodeLabel="value"
+                    nodeCanvasObject={(node, ctx) => this.nodePaint(node, ctx)}
                     width={500}
                     height={500}
                 />

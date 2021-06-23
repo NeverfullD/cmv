@@ -32,7 +32,7 @@ export default class Main extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             model: { parameters: [], compartments: [] },
-            currentTick: 0,
+            currentTick: -1,
             timeSteps: [],
             stepSize: 0.1,
             maxError: 0.001,
