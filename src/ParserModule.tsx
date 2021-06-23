@@ -94,7 +94,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
     };
 
     handleChange(event: any) {
-        this.setState({ value: event.target.value });
+        this.setState({ value: event.target.value, selectedModel: 0 });
     }
 
     componentDidMount() {}
