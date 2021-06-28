@@ -1,6 +1,7 @@
 import React from "react";
-import "./Settings.css";
+import "./SettingsModule.css";
 import * as config from "./config.json";
+import { SolverType } from "./Solver";
 
 interface IProps {
     onSimulate: (n: number) => void;
@@ -9,6 +10,7 @@ interface IProps {
     stepSize: number;
     maxError: number;
     selectedSolver: string;
+    selectedSolverType: SolverType;
     changeSelectedSolver: (selectedSolver: string) => void;
 }
 
@@ -18,7 +20,7 @@ interface IState {
     maxError: string;
 }
 
-export default class Settings extends React.Component<IProps, IState> {
+export default class SettingsModule extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = { steps: "", stepSize: props.stepSize.toString(), maxError: props.maxError.toString() };
@@ -64,20 +66,13 @@ export default class Settings extends React.Component<IProps, IState> {
     render() {
         var settings;
 
-        if (
-            this.props.selectedSolver === "euler" ||
-            this.props.selectedSolver === "rungeKutta2" ||
-            this.props.selectedSolver === "rungeKutta4"
-        ) {
+        if (this.props.selectedSolverType === SolverType.manualStepSize) {
             settings = [
                 <br />,
                 <input type="text" value={this.state.stepSize} onChange={this.handleChangeStepSize} />,
                 <button onClick={this.onChangeStepSize}>{config.setStepSizeButton}</button>,
             ];
-        } else if (
-            this.props.selectedSolver === "rungeKutta4Automatic" ||
-            this.props.selectedSolver === "bulirschStoer"
-        ) {
+        } else if (this.props.selectedSolverType === SolverType.errorControlled) {
             settings = [
                 <br />,
                 <input type="text" value={this.state.maxError} onChange={this.handleChangeMaxError} />,

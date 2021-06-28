@@ -9,10 +9,10 @@ import {
     RungeKutta4Method,
     Solver,
 } from "./Solver";
-import MyChart from "./Chart";
-import Graph from "./Graph";
+import ChartModule from "./ChartModule";
+import GraphModule from "./GraphModule";
 import ParserModule from "./ParserModule";
-import Settings from "./Settings";
+import SettingsModule from "./SettingsModule";
 import * as config from "./config.json";
 
 interface IProps {}
@@ -126,22 +126,23 @@ export default class Main extends React.Component<IProps, IState> {
                 <button onClick={this.onClick}>Test</button>
                 <h2>{config.title}</h2>
                 <ParserModule setNewModel={this.setModel} />
-                <Settings
+                <SettingsModule
                     onSimulate={this.onSimulate}
                     changeStepSize={this.changeStepSize}
                     changeMaxError={this.changeMaxError}
                     stepSize={this.state.stepSize}
                     maxError={this.state.maxError}
                     selectedSolver={this.state.selectedSolver}
+                    selectedSolverType={this.state.solver.solverType}
                     changeSelectedSolver={this.changeSelectedSolver}
                 />
-                <MyChart
+                <ChartModule
                     model={this.state.model}
                     timeSteps={this.state.timeSteps}
                     currentTick={this.state.currentTick}
                     key={this.state.currentTick + "chart"}
                 />
-                <Graph model={this.state.model} key={this.state.currentTick + "graph"} />
+                <GraphModule model={this.state.model} key={this.state.currentTick + "graph"} />
             </div>
         );
     }

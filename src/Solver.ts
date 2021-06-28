@@ -6,10 +6,16 @@ export interface Result {
     timeStep: number;
 }
 
+export enum SolverType {
+    manualStepSize,
+    errorControlled,
+}
+
 export abstract class Solver {
     stepSize: number;
     timeStep: number;
     model: CModel;
+    abstract solverType: SolverType;
 
     constructor(stepSize: number, timeStep: number, model: CModel) {
         this.stepSize = stepSize;
@@ -31,6 +37,8 @@ export abstract class Solver {
 }
 
 export class EulerMethod extends Solver {
+    solverType = SolverType.manualStepSize;
+
     execute() {
         var variables = this.generateVariables();
         var res: Map<string, number> = new Map();
@@ -47,6 +55,8 @@ export class EulerMethod extends Solver {
 }
 
 export class RungeKutta2Method extends Solver {
+    solverType = SolverType.manualStepSize;
+
     execute() {
         var variables = this.generateVariables();
         var res: Map<string, number> = new Map();
@@ -112,6 +122,8 @@ abstract class RungeKutta4Base extends Solver {
 }
 
 export class RungeKutta4Method extends RungeKutta4Base {
+    solverType = SolverType.manualStepSize;
+
     execute() {
         var variables = this.generateVariables();
         this.timeStep = this.timeStep + this.stepSize;
@@ -123,6 +135,8 @@ export class RungeKutta4Method extends RungeKutta4Base {
 }
 
 export class RungeKutta4AutomaticMethod extends RungeKutta4Base {
+    solverType = SolverType.errorControlled;
+
     error: number;
     maxError: number;
 
@@ -163,6 +177,8 @@ export class RungeKutta4AutomaticMethod extends RungeKutta4Base {
 }
 
 export class BulirschStoerMethod extends Solver {
+    solverType = SolverType.errorControlled;
+
     error: number;
     depth: number;
     maxError: number;

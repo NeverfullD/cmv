@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "react-google-charts";
 
-import "./Chart.css";
+import "./ChartModule.css";
 import { CsvDataService } from "./CSVDataService";
 import { CModel } from "./Types";
 
@@ -15,7 +15,7 @@ interface IState {
     data: [any[]];
 }
 
-export default class MyChart extends React.Component<IProps, IState> {
+export default class ChartModule extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         var data = this.generateData();
