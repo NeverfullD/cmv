@@ -3,6 +3,7 @@ import ForceGraph2D, { NodeObject } from "react-force-graph-2d";
 
 import "./GraphModule.css";
 import { CompartmentModel } from "./Types";
+import * as config from "./config.json";
 
 interface IProps {
     model: CompartmentModel;
@@ -69,6 +70,7 @@ export default class GraphModule extends React.Component<IProps, IState> {
     render() {
         return (
             <div className="graph">
+                {config.graphTitle}
                 <ForceGraph2D
                     graphData={this.state.data}
                     nodeLabel="value"

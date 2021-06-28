@@ -18,6 +18,10 @@
     "getDataTitle": "Download",
     "getDataButton": "Download Data",
 
+    "graphTitle": "Model Topography",
+
+    "chartTitle": "Data Preview",
+
     "models": [
         {
             "name": "Custom",

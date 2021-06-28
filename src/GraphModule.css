@@ -1,4 +1,6 @@
 .graph {
     padding: 10px;
-    border: 2px solid red;
+}
+.graph canvas {
+    border: 1px solid gray;
 }

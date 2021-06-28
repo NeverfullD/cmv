@@ -44,11 +44,6 @@ export default class Main extends React.Component<IProps, IState> {
 
     componentDidMount() {}
 
-    onClick = () => {
-        //console.log(this.state);
-        console.log(config);
-    };
-
     //handle Settings
     setModel = (newModel: CompartmentModel) => {
         this.setState({
@@ -140,7 +135,6 @@ export default class Main extends React.Component<IProps, IState> {
 
         return (
             <div className="main">
-                <button onClick={this.onClick}>Test</button>
                 <h2>{config.title}</h2>
                 <ParserModule setNewModel={this.setModel} />
                 <GraphModule model={this.state.model} key={this.state.currentTick + "graph"} />
