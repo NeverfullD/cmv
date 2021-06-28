@@ -1,4 +1,5 @@
 import React from "react";
+import "./Main.css";
 import { CompartmentModel } from "./Types";
 import {
     BulirschStoerMethod,
@@ -122,10 +123,11 @@ export default class Main extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <div>
+            <div className="main">
                 <button onClick={this.onClick}>Test</button>
                 <h2>{config.title}</h2>
                 <ParserModule setNewModel={this.setModel} />
+                <GraphModule model={this.state.model} key={this.state.currentTick + "graph"} />
                 <SettingsModule
                     onSimulate={this.onSimulate}
                     changeStepSize={this.changeStepSize}
@@ -136,7 +138,6 @@ export default class Main extends React.Component<IProps, IState> {
                     selectedSolverType={this.state.solver.solverType}
                     changeSelectedSolver={this.changeSelectedSolver}
                 />
-                <GraphModule model={this.state.model} key={this.state.currentTick + "graph"} />
                 <ChartModule
                     model={this.state.model}
                     timeSteps={this.state.timeSteps}

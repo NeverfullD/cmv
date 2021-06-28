@@ -1,8 +1,13 @@
 .parser {
     border: 2px solid red;
+    padding: 10px;
 }
 
 .parserText {
     height: 200px;
-    width: 500px;
+    width: 100%;
+}
+
+.parser button {
+    margin-right: 10px;
 }

@@ -4,10 +4,6 @@ import ForceGraph2D, { NodeObject } from "react-force-graph-2d";
 import "./GraphModule.css";
 import { CompartmentModel } from "./Types";
 
-interface NodeType extends NodeObject {
-    value: number;
-}
-
 interface IProps {
     model: CompartmentModel;
 }
@@ -21,7 +17,6 @@ export default class GraphModule extends React.Component<IProps, IState> {
         super(props);
 
         var data = this.generateInitialDataStructure();
-        //console.log(data);
 
         this.state = {
             data: data,
@@ -41,8 +36,6 @@ export default class GraphModule extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {}
-
-    onClick() {}
 
     getRandomInt = (max: number) => {
         return Math.floor(Math.random() * max);
@@ -80,12 +73,9 @@ export default class GraphModule extends React.Component<IProps, IState> {
                     graphData={this.state.data}
                     nodeLabel="value"
                     nodeCanvasObject={(node, ctx) => this.nodePaint(node, ctx)}
-                    width={500}
-                    height={500}
+                    width={600}
+                    height={300}
                 />
-                {
-                    //<button onClick={this.onClick.bind(this)}>Test</button>
-                }
             </div>
         );
     }

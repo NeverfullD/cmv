@@ -37,8 +37,6 @@ export default class ChartModule extends React.Component<IProps, IState> {
             this.props.model.compartments.forEach((c) => dataPoint.push(c.value[i]));
             data.push(dataPoint);
         }
-        //console.log(data);
-
         return data;
     }
 
