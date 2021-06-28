@@ -1,6 +1,6 @@
 import { Expression } from "expr-eval";
 
-export interface CModel {
+export interface CompartmentModel {
     parameters: Parameter[];
     compartments: Compartment[];
 }

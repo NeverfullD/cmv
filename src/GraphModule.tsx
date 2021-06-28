@@ -2,14 +2,14 @@ import React from "react";
 import ForceGraph2D, { NodeObject } from "react-force-graph-2d";
 
 import "./GraphModule.css";
-import { CModel } from "./Types";
+import { CompartmentModel } from "./Types";
 
 interface NodeType extends NodeObject {
     value: number;
 }
 
 interface IProps {
-    model: CModel;
+    model: CompartmentModel;
 }
 
 interface IState {
@@ -76,7 +76,6 @@ export default class GraphModule extends React.Component<IProps, IState> {
     render() {
         return (
             <div className="graph">
-                GraphModule
                 <ForceGraph2D
                     graphData={this.state.data}
                     nodeLabel="value"

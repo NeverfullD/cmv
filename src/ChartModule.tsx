@@ -3,10 +3,12 @@ import Chart from "react-google-charts";
 
 import "./ChartModule.css";
 import { CsvDataService } from "./CSVDataService";
-import { CModel } from "./Types";
+import { CompartmentModel } from "./Types";
+
+import * as config from "./config.json";
 
 interface IProps {
-    model: CModel;
+    model: CompartmentModel;
     timeSteps: number[];
     currentTick: number;
 }
@@ -46,27 +48,31 @@ export default class ChartModule extends React.Component<IProps, IState> {
         CsvDataService.exportToCsv("data.csv", this.state.data);
     };
 
+    renderChart = () => {
+        return (
+            <Chart
+                width={"100%"}
+                height={"500px"}
+                chartType="LineChart"
+                loader={<div>Loading Chart</div>}
+                data={this.state.data}
+                options={{
+                    hAxis: {
+                        title: "Time",
+                    },
+                    vAxis: {
+                        title: "Value",
+                    },
+                }}
+            />
+        );
+    };
+
     render() {
         return (
             <div className="chart">
-                Chart
-                <Chart
-                    width={"600px"}
-                    height={"400px"}
-                    chartType="LineChart"
-                    loader={<div>Loading Chart</div>}
-                    data={this.state.data}
-                    options={{
-                        hAxis: {
-                            title: "Time",
-                        },
-                        vAxis: {
-                            title: "Value",
-                        },
-                    }}
-                    rootProps={{ "data-testid": "2" }}
-                />
-                <button onClick={this.onClickGetData}>Get Data</button>
+                <button onClick={this.onClickGetData}>{config.getData}</button>
+                {this.props.currentTick > 0 ? this.renderChart() : <br />}
             </div>
         );
     }

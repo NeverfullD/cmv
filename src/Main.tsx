@@ -1,5 +1,5 @@
 import React from "react";
-import { CModel } from "./Types";
+import { CompartmentModel } from "./Types";
 import {
     BulirschStoerMethod,
     EulerMethod,
@@ -18,7 +18,7 @@ import * as config from "./config.json";
 interface IProps {}
 
 interface IState {
-    model: CModel;
+    model: CompartmentModel;
     timeSteps: number[];
     currentTick: number;
     stepSize: number;
@@ -49,7 +49,7 @@ export default class Main extends React.Component<IProps, IState> {
     };
 
     //handle Settings
-    setModel = (newModel: CModel) => {
+    setModel = (newModel: CompartmentModel) => {
         this.setState({
             model: newModel,
             currentTick: 0,
@@ -81,7 +81,7 @@ export default class Main extends React.Component<IProps, IState> {
         });
     };
 
-    getSolver(selectedSolver: string, timeStep: number, model: CModel): Solver {
+    getSolver(selectedSolver: string, timeStep: number, model: CompartmentModel): Solver {
         switch (selectedSolver) {
             case "euler":
                 return new EulerMethod(this.state.stepSize, timeStep, model);
@@ -136,13 +136,13 @@ export default class Main extends React.Component<IProps, IState> {
                     selectedSolverType={this.state.solver.solverType}
                     changeSelectedSolver={this.changeSelectedSolver}
                 />
+                <GraphModule model={this.state.model} key={this.state.currentTick + "graph"} />
                 <ChartModule
                     model={this.state.model}
                     timeSteps={this.state.timeSteps}
                     currentTick={this.state.currentTick}
                     key={this.state.currentTick + "chart"}
                 />
-                <GraphModule model={this.state.model} key={this.state.currentTick + "graph"} />
             </div>
         );
     }

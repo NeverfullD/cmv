@@ -1,6 +1,6 @@
 import React from "react";
 import "./ParserModule.css";
-import { CModel } from "./Types";
+import { CompartmentModel } from "./Types";
 import { Parser, generate } from "peggy";
 import * as config from "./config.json";
 
@@ -21,7 +21,7 @@ _ "whitespace" = [ \\t\\n\\r]*
 calc = "{" calc:[^}]* "}" {return calc.join("")}`;
 
 interface IProps {
-    setNewModel: (newModel: CModel) => void;
+    setNewModel: (newModel: CompartmentModel) => void;
 }
 
 interface ParseError {
@@ -57,7 +57,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
     onLoadModel = (event: any) => {
         //parse Input
         try {
-            var model: CModel = this.state.parser.parse(this.state.value);
+            var model: CompartmentModel = this.state.parser.parse(this.state.value);
             //insert constants
             var constants = new Map();
             model.parameters.forEach((p) => constants.set(p.name, p.value));

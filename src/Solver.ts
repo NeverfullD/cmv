@@ -1,5 +1,5 @@
 import { Expression } from "expr-eval";
-import { CModel } from "./Types";
+import { CompartmentModel } from "./Types";
 
 export interface Result {
     result: Map<string, number>;
@@ -14,10 +14,10 @@ export enum SolverType {
 export abstract class Solver {
     stepSize: number;
     timeStep: number;
-    model: CModel;
+    model: CompartmentModel;
     abstract solverType: SolverType;
 
-    constructor(stepSize: number, timeStep: number, model: CModel) {
+    constructor(stepSize: number, timeStep: number, model: CompartmentModel) {
         this.stepSize = stepSize;
         this.timeStep = timeStep;
         this.model = model;
@@ -140,7 +140,7 @@ export class RungeKutta4AutomaticMethod extends RungeKutta4Base {
     error: number;
     maxError: number;
 
-    constructor(stepSize: number, timeStep: number, model: CModel, maxError: number) {
+    constructor(stepSize: number, timeStep: number, model: CompartmentModel, maxError: number) {
         super(stepSize, timeStep, model);
         this.error = 0;
         this.maxError = maxError;
@@ -183,7 +183,7 @@ export class BulirschStoerMethod extends Solver {
     depth: number;
     maxError: number;
 
-    constructor(stepSize: number, timeStep: number, model: CModel, depth: number, maxError: number) {
+    constructor(stepSize: number, timeStep: number, model: CompartmentModel, depth: number, maxError: number) {
         super(stepSize, timeStep, model);
         this.error = 0;
         this.depth = depth;
