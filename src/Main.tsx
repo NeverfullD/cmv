@@ -121,7 +121,23 @@ export default class Main extends React.Component<IProps, IState> {
         this.setState({ currentTick: this.state.currentTick + steps });
     }
 
+    generateData() {
+        var header: any[] = ["x"];
+        this.state.model.compartments.forEach((c) => header.push(c.name));
+
+        var data: [any[]] = [header];
+
+        for (let i = 0; i <= this.state.currentTick; i++) {
+            var dataPoint = [this.state.timeSteps[i]];
+            this.state.model.compartments.forEach((c) => dataPoint.push(c.value[i]));
+            data.push(dataPoint);
+        }
+        return data;
+    }
+
     render() {
+        var data = this.generateData();
+
         return (
             <div className="main">
                 <button onClick={this.onClick}>Test</button>
@@ -137,9 +153,10 @@ export default class Main extends React.Component<IProps, IState> {
                     selectedSolver={this.state.selectedSolver}
                     selectedSolverType={this.state.solver.solverType}
                     changeSelectedSolver={this.changeSelectedSolver}
+                    data={data}
                 />
                 <ChartModule
-                    model={this.state.model}
+                    data={data}
                     timeSteps={this.state.timeSteps}
                     currentTick={this.state.currentTick}
                     key={this.state.currentTick + "chart"}

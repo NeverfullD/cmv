@@ -15,7 +15,8 @@
     "timeControlTitle": "Time Control",
     "simulateForButton": "Simulate for",
 
-    "getData": "Download Data",
+    "getDataTitle": "Download",
+    "getDataButton": "Download Data",
 
     "models": [
         {

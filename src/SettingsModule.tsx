@@ -2,6 +2,7 @@ import React from "react";
 import "./SettingsModule.css";
 import * as config from "./config.json";
 import { SolverType } from "./Solver";
+import { CsvDataService } from "./CSVDataService";
 
 interface IProps {
     onSimulate: (n: number) => void;
@@ -12,6 +13,7 @@ interface IProps {
     selectedSolver: string;
     selectedSolverType: SolverType;
     changeSelectedSolver: (selectedSolver: string) => void;
+    data: [any[]];
 }
 
 interface IState {
@@ -61,6 +63,10 @@ export default class SettingsModule extends React.Component<IProps, IState> {
         this.props.changeSelectedSolver(event.target.value);
     };
 
+    onGetData = () => {
+        CsvDataService.exportToCsv("data.csv", this.props.data);
+    };
+
     componentDidMount() {}
 
     render() {
@@ -103,6 +109,12 @@ export default class SettingsModule extends React.Component<IProps, IState> {
                     <br />
                     <button onClick={this.onSimulate}>{config.simulateForButton} </button>
                     <input type="text" value={this.state.steps} onChange={this.handleChangeSteps} />
+                    <br />
+                </div>
+                <div>
+                    {config.getDataTitle}
+                    <br />
+                    <button onClick={this.onGetData}>{config.getDataButton} </button>
                     <br />
                 </div>
             </div>
