@@ -25,11 +25,11 @@
     "models": [
         {
             "name": "Custom",
-            "value": ""
+            "modelText": ""
         },
         {
             "name": "SIR",
-            "value": "param alpha 0.75\nparam beta 0.1\nparam N 10000\n\ncomp S 9999 {-alpha*S*I/N}\ncomp I 1 {alpha*S*I/N - beta*I}\ncomp R 0 {beta*I}"
+            "modelText": "param alpha 0.75\nparam beta 0.1\nparam N 10000\n\ncomp S 9999 {-alpha*S*I/N}\ncomp I 1 {alpha*S*I/N - beta*I}\ncomp R 0 {beta*I}"
         }
     ]
 }

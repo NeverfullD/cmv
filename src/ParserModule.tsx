@@ -30,13 +30,18 @@ interface ParseError {
     location: string;
 }
 
+interface StoredModels {
+    name: string;
+    modelText: string;
+}
+
 interface IState {
-    value: string;
+    modelText: string;
     parser: Parser;
     error: ParseError;
     loadedModel: boolean;
     selectedModel: number;
-    customModels: { name: string; value: string }[];
+    customModels: StoredModels[];
 }
 
 export default class ParserModule extends React.Component<IProps, IState> {
@@ -44,7 +49,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
         super(props);
         var retrievedModels = localStorage.getItem("savedModels");
         this.state = {
-            value: "",
+            modelText: "",
             parser: generate(modelGrammar),
             error: { hasError: false, message: "", location: "" },
             loadedModel: false,
@@ -57,7 +62,7 @@ export default class ParserModule extends React.Component<IProps, IState> {
     onLoadModel = (event: any) => {
         //parse Input
         try {
-            var model: CompartmentModel = this.state.parser.parse(this.state.value);
+            var model: CompartmentModel = this.state.parser.parse(this.state.modelText);
             //insert constants
             var constants = new Map();
             model.parameters.forEach((p) => constants.set(p.name, p.value));
@@ -93,23 +98,23 @@ export default class ParserModule extends React.Component<IProps, IState> {
         event.preventDefault();
     };
 
-    handleChange(event: any) {
-        this.setState({ value: event.target.value, selectedModel: 0 });
-    }
+    onChangeModelText = (event: any) => {
+        this.setState({ modelText: event.target.value, selectedModel: 0 });
+    };
 
     componentDidMount() {}
 
     handleSelectedModel = (event: any) => {
         this.setState({
             selectedModel: event.target.value,
-            value: config.models.concat(this.state.customModels)[event.target.value].value,
+            modelText: config.models.concat(this.state.customModels)[event.target.value].modelText,
         });
     };
 
     onSaveModel = () => {
         this.state.customModels.push({
             name: "Custom Model " + this.state.customModels.length,
-            value: this.state.value,
+            modelText: this.state.modelText,
         });
         localStorage.setItem("savedModels", JSON.stringify(this.state.customModels));
         this.setState({ selectedModel: this.state.customModels.length + 1 });
@@ -153,8 +158,8 @@ export default class ParserModule extends React.Component<IProps, IState> {
                 <textarea
                     className="parserText"
                     placeholder={config.modelTextAreaPlaceholder}
-                    value={this.state.value}
-                    onChange={this.handleChange.bind(this)}
+                    value={this.state.modelText}
+                    onChange={this.onChangeModelText}
                 />
                 <br />
                 <button onClick={this.onLoadModel}>
