@@ -182,6 +182,7 @@ export class BulirschStoerMethod extends Solver {
     error: number;
     depth: number;
     maxError: number;
+    maxDepth = 8; // how many rows to be calculated
 
     constructor(stepSize: number, timeStep: number, model: CompartmentModel, depth: number, maxError: number) {
         super(stepSize, timeStep, model);
@@ -193,8 +194,6 @@ export class BulirschStoerMethod extends Solver {
     //Bulirsch-Stoer Method
     execute() {
         var variables = this.generateVariables();
-        const maxDepth = 8; // how many rows to be calculated
-
         var triangleMatrix: Map<string, number>[][] = [];
 
         //error controlling loop
@@ -211,7 +210,7 @@ export class BulirschStoerMethod extends Solver {
             }
             //big error increase depth or decrease stepSize
             else if (this.error > this.maxError) {
-                if (this.depth < maxDepth) {
+                if (this.depth < this.maxDepth) {
                     this.depth = this.depth + 1;
                 } else {
                     this.stepSize = this.stepSize / 2;
