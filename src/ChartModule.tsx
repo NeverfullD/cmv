@@ -5,7 +5,6 @@ import * as config from "./config.json";
 
 interface IProps {
     data: [any[]];
-    timeSteps: number[];
     currentTick: number;
 }
 

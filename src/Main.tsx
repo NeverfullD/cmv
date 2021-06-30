@@ -149,12 +149,7 @@ export default class Main extends React.Component<IProps, IState> {
                     changeSelectedSolver={this.changeSelectedSolver}
                     data={data}
                 />
-                <ChartModule
-                    data={data}
-                    timeSteps={this.state.timeSteps}
-                    currentTick={this.state.currentTick}
-                    key={this.state.currentTick + "chart"}
-                />
+                <ChartModule data={data} currentTick={this.state.currentTick} key={this.state.currentTick + "chart"} />
             </div>
         );
     }
