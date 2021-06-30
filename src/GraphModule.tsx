@@ -5,12 +5,27 @@ import "./GraphModule.css";
 import { CompartmentModel } from "./Types";
 import * as config from "./config.json";
 
+interface Node {
+    id: string;
+    value: number;
+}
+
+interface Link {
+    source: string;
+    target: string;
+}
+
+interface Data {
+    nodes: Node[];
+    links: Link[];
+}
+
 interface IProps {
     model: CompartmentModel;
 }
 
 interface IState {
-    data: { nodes: { id: string; value: number }[]; links: { source: string; target: string }[] };
+    data: Data;
 }
 
 export default class GraphModule extends React.Component<IProps, IState> {
@@ -24,12 +39,12 @@ export default class GraphModule extends React.Component<IProps, IState> {
         };
     }
 
-    generateInitialDataStructure() {
-        var node: { id: string; value: number }[] = [];
+    generateInitialDataStructure(): Data {
+        var node: Node[] = [];
         this.props.model.compartments.forEach((c) => {
             node.push({ id: c.name, value: c.value[c.value.length - 1] });
         });
-        var link: { source: string; target: string }[] = [];
+        var link: Link[] = [];
         this.props.model.compartments.forEach((c) => {
             c.ODE.symbols().forEach((sym) => link.push({ source: c.name, target: sym }));
         });
