@@ -17,7 +17,7 @@ interface IProps {
 }
 
 interface IState {
-    steps: string;
+    time: string;
     stepSize: string;
     maxError: string;
 }
@@ -25,7 +25,7 @@ interface IState {
 export default class SettingsModule extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
-        this.state = { steps: "", stepSize: props.stepSize.toString(), maxError: props.maxError.toString() };
+        this.state = { time: "", stepSize: props.stepSize.toString(), maxError: props.maxError.toString() };
     }
 
     onSimulate1 = () => {
@@ -38,11 +38,11 @@ export default class SettingsModule extends React.Component<IProps, IState> {
         this.props.onSimulate(100);
     };
     onSimulate = () => {
-        this.props.onSimulate(parseInt(this.state.steps));
+        this.props.onSimulate(parseFloat(this.state.time));
     };
 
     handleChangeSteps = (event: any) => {
-        this.setState({ steps: event.target.value });
+        this.setState({ time: event.target.value });
     };
 
     onChangeStepSize = () => {
@@ -108,7 +108,7 @@ export default class SettingsModule extends React.Component<IProps, IState> {
                     <button onClick={this.onSimulate100}>100</button>
                     <br />
                     <button onClick={this.onSimulate}>{config.simulateForButton} </button>
-                    <input type="text" value={this.state.steps} onChange={this.handleChangeSteps} />
+                    <input type="text" value={this.state.time} onChange={this.handleChangeSteps} />
                     <br />
                 </div>
                 <div>
