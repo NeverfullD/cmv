@@ -86,9 +86,9 @@ export default class Main extends React.Component<IProps, IState> {
             case "rungeKutta4":
                 return new RungeKutta4Method(this.state.stepSize, timeStep, model);
             case "rungeKutta4Automatic":
-                return new RungeKutta4AutomaticMethod(this.state.stepSize, timeStep, model, this.state.maxError);
+                return new RungeKutta4AutomaticMethod(0.1, timeStep, model, this.state.maxError);
             case "bulirschStoer":
-                return new BulirschStoerMethod(this.state.stepSize, timeStep, model, 4, this.state.maxError);
+                return new BulirschStoerMethod(0.1, timeStep, model, 4, this.state.maxError);
             default:
                 return new EulerMethod(this.state.stepSize, timeStep, model);
         }
