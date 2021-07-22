@@ -6,33 +6,31 @@ A project built with React to simulate and visualize compartment models.
 
 How to Describe the Model for the Simulation.
 
-const:\
-(param k 0.1)\
+The model consists of two parts:
+
+constant Parameters:
+```
+param k 0.1
+```
+Following the pattern:\
 keyword name value
 
-Copartments:\
-(comp A 5 {k\*A})\
+Compartments:
+```
+comp A 5 {k*A}
+```
+Following the pattern:\
 keyword name value ODE
 
+The Parameters must be written above the compartments.
+
 Example
-
-```lisp
-(param alpha 0.75)
-(param beta 0.1)
-(param N 10000)
-
-(comp S 9999 {-alpha*S*I/N})
-(comp I 1 {alpha*S*I/N - beta*I})
-(comp R 0 {beta*I})
 ```
+param alpha 0.75
+param beta 0.1
+param N 10000
 
-## TODO
-
--   Visualization
-    -   add text to graph
-    -   change settings depending on solver
--   Technical
-    -   Initialize chart to remove error message
-    -   add configuration file
-    -   add default models
-    -   add local model store
+comp S 9999 {-alpha*S*I/N}
+comp I 1 {alpha*S*I/N - beta*I}
+comp R 0 {beta*I}
+```
