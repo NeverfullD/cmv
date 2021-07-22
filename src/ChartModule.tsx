@@ -37,7 +37,14 @@ export default class ChartModule extends React.Component<IProps, IState> {
         return (
             <div className="chart">
                 {config.chartTitle}
-                {this.props.currentTick > 0 ? this.renderChart() : <br />}
+                {this.props.currentTick > 0 ? (
+                    this.renderChart()
+                ) : (
+                    <div>
+                        <br />
+                        {config.chartNoDataAvailable}
+                    </div>
+                )}
             </div>
         );
     }

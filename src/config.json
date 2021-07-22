@@ -21,6 +21,7 @@
     "graphTitle": "Model Topography",
 
     "chartTitle": "Data Preview",
+    "chartNoDataAvailable": "There is no data to display at the moment.",
 
     "models": [
         {
