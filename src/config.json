@@ -31,6 +31,22 @@
         {
             "name": "SIR",
             "modelText": "param alpha 0.75\nparam beta 0.1\nparam N 10000\n\ncomp S 9999 {-alpha*S*I/N}\ncomp I 1 {alpha*S*I/N - beta*I}\ncomp R 0 {beta*I}"
+        },
+        {
+            "name": "ode1",
+            "modelText": "param rate 1\n\ncomp u 1 {-rate*u}"
+        },
+        {
+            "name": "ode_order2",
+            "modelText": "comp ut 1 {-1 * u}\ncomp u 0 {ut}"
+        },
+        {
+            "name": "ode_implicit",
+            "modelText": "comp t 0 {1}\ncomp v 1 {t}\ncomp u 2 {2*t}"
+        },
+        {
+            "name": "ode_comp3",
+            "modelText": "param V 0.07\nparam PS1 0.05\nparam PS2 0.02\n\ncomp C1 5 {PS1/V*(C2 - C1)}\ncomp C2 3 {PS1/V*(C1 - C2) + PS2/V*(C3-C2)}\ncomp C3 0 {PS2/V*(C2 - C3)}"
         }
     ]
 }
