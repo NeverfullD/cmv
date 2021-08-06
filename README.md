@@ -2,6 +2,8 @@
 
 A project built with React to simulate and visualize compartment models.
 
+[To the Simulator](https://neverfulld.github.io/cmv/)
+
 ## model DSL
 
 How to Describe the Model for the Simulation.
