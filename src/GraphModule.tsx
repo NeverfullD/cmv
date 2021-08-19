@@ -41,12 +41,16 @@ export default class GraphModule extends React.Component<IProps, IState> {
 
     generateInitialDataStructure(): Data {
         var node: Node[] = [];
+        var allowedSym: string[] = [];
         this.props.model.compartments.forEach((c) => {
             node.push({ id: c.name, value: c.value[c.value.length - 1] });
+            allowedSym.push(c.name);
         });
         var link: Link[] = [];
         this.props.model.compartments.forEach((c) => {
-            c.ODE.symbols().forEach((sym) => link.push({ source: c.name, target: sym }));
+            c.ODE.symbols().forEach((sym) => {
+                if (allowedSym.includes(sym)) link.push({ source: c.name, target: sym });
+            });
         });
         return { nodes: node, links: link };
     }
