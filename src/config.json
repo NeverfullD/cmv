@@ -47,6 +47,30 @@
         {
             "name": "ode_comp3",
             "modelText": "param V 0.07\nparam PS1 0.05\nparam PS2 0.02\n\ncomp C1 5 {PS1/V*(C2 - C1)}\ncomp C2 3 {PS1/V*(C1 - C2) + PS2/V*(C3-C2)}\ncomp C3 0 {PS2/V*(C2 - C3)}"
+        },
+        {
+            "name": "lung",
+            "modelText": "param Com 50\nparam Res 0.01\nparam Patmos 0\nparam ScalPvent 10\nparam VFRC 3000\n\ncomp t 0 {1}\ncomp Vlung 3000 {((Patmos + ScalPvent * if(t%6<2,1,0)) - (Patmos + (Vlung-VFRC)/Com))/Res}"
+        },
+        {
+            "name": "Aspirin",
+            "modelText": "param kon1  .1827\nparam KD1   6.304\nparam koff1 1.1517408\nparam kon2  .0030\nparam KD2   250\nparam koff2 0.75\nparam Gp    0.03\nparam Etot  10\n\ncomp LSA 8.183 {-kon1*LSA*(Etot - LSAE)+koff1*LSAE}\ncomp LSAE 0 {kon1*LSA*(Etot - LSAE)-koff1*LSAE-koff2*LSAE+kon2*(Etot - LSAE)*LP}\ncomp LP   0 {koff2*LSAE - kon2*(Etot - LSAE)*LP - Gp*LP}"
+        },
+        {
+            "name": "Fish1",
+            "modelText": "comp F 0 {0.322-0.387*F}"
+        },
+        {
+            "name": "Fish2",
+            "modelText": "comp FT 0 {2*0.408-1.307*FT+0.432*FP}\ncomp FP 0 {0.432*FT-0.432*FP}"
+        },
+        {
+            "name": "CMS_SEIR",
+            "modelText": "param Ki 0.0005\nparam Kl 0.2\nparam Kr 0.14\nparam Kw 0.007407407\n\ncomp S 990 {Kw*R-Ki*S*I}\ncomp Ex 0 {Ki*S*I-Kl*Ex}\ncomp I 10 {Kl*Ex-Kr*I}\ncomp R 0 {Kr*I-Kw*R}"
+        },
+        {
+            "name": "covid19_SEIR",
+            "modelText": "param b 0.00018\nparam mu 0.00004563\nparam mup 0.1724\nparam alpha1 0.10\nparam alpha2 0.10\nparam beta1 0.00414\nparam beta2 0.0115\nparam delta 0.7\nparam psi 0.0051\nparam omega 0.09\nparam sigma 0.0018\nparam gammas 0.05\nparam gammaa 0.0714\nparam etas 0.1\nparam etaa 0.05\n\ncomp S 93000 {b-((beta1*S*P)/(1+alpha1*P))-((beta2*S*(Ia+Is))/(1+alpha2*(Ia+Is)))+psi*Ex-mu*S}\ncomp Ex 1000 {((beta1*S*P)/(1+alpha1*P))+((beta2*S*(Ia+Is))/(1+alpha2*(Ia+Is)))-psi*Ex-mu*Ex-omega*Ex}\ncomp Ia 50 {(1-delta)*omega*Ex-(mu+sigma)*Ia-gammaa*Ia}\ncomp Is 50 {delta*omega*Ex-(mu+sigma)*Is-gammas*Is}\ncomp R 0 {gammas*Is+gammaa*Ia-mu*R}\ncomp P 500 {etaa*Ia+etas*Is-mup*P}"
         }
     ]
 }
