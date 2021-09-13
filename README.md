@@ -28,7 +28,9 @@ comp A 5 {k*A}
 Following the pattern:\
 keyword name value ODE
 
-The Parameters must be written above the compartments.
+The Parameters must be written above the compartments.\
+The name E is reserved and can not be used for a compartment or parameter.\
+The ODE is evaluated through [this](https://github.com/silentmatt/expr-eval) evaluation framework.
 
 Example
 
